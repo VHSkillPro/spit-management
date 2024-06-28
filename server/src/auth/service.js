@@ -58,8 +58,14 @@ const login = async (req, res) => {
         return res.status(HTTP_STATUS_CODE.OK).send({
             status: "success",
             data: {
-                accessToken,
-                refreshToken,
+                accessToken: {
+                    token: accessToken,
+                    expired: parseInt(process.env.AT_LIFE),
+                },
+                refreshToken: {
+                    token: refreshToken,
+                    expired: parseInt(process.env.RT_LIFE),
+                },
             },
             message: "Login successfully.",
         });
@@ -210,8 +216,14 @@ const refreshAccessToken = async (req, res) => {
         return res.status(HTTP_STATUS_CODE.OK).send({
             status: "success",
             data: {
-                accessToken: newAccessToken,
-                refreshToken: newRefreshToken,
+                accessToken: {
+                    token: newAccessToken,
+                    expired: parseInt(process.env.AT_LIFE),
+                },
+                refreshToken: {
+                    token: newRefreshToken,
+                    expired: parseInt(process.env.RT_LIFE),
+                },
             },
             message: "Refresh access token successfully.",
         });
