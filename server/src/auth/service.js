@@ -20,7 +20,7 @@ const login = async (req, res) => {
         if (!errors.isEmpty()) {
             return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({
                 status: "error",
-                message: "Invalid request data.",
+                message: "Tên tài khoản và mật khẩu không được trống",
             });
         }
 
@@ -32,7 +32,7 @@ const login = async (req, res) => {
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).send({
                 status: "error",
-                message: "Username or password is incorrect.",
+                message: "Tên đăng nhập hoặc mật khẩu không chính xác",
             });
         }
 
@@ -67,14 +67,14 @@ const login = async (req, res) => {
                     expired: parseInt(process.env.RT_LIFE),
                 },
             },
-            message: "Login successfully.",
+            message: "Đăng nhập thành công",
         });
     } catch (error) {
         console.log(error);
 
         return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send({
             status: "error",
-            message: "Internal Server Error.",
+            message: "Lỗi máy chủ",
         });
     }
 };
@@ -105,7 +105,7 @@ const register = async (req, res) => {
         if (user) {
             return res.status(HTTP_STATUS_CODE.CONFLICT).send({
                 status: "error",
-                message: "Username already exists.",
+                message: "Tên tài khoản đã tồn tại",
             });
         }
 
