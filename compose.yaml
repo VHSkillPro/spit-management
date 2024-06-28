@@ -1,0 +1,73 @@
+# Comments are provided throughout this file to help you get started.
+# If you need more help, visit the Docker Compose reference guide at
+# https://docs.docker.com/go/compose-spec-reference/
+
+# Here the instructions define your application as a service called "app".
+# This service is built from the Dockerfile in the current directory.
+# You can add other services your application may depend on here, such as a
+# database or a cache. For examples, see the Awesome Compose repository:
+# https://github.com/docker/awesome-compose
+
+services:
+  database:
+    image: mysql:latest
+    container_name: spit_management_database
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=a112233
+    volumes:
+      - ./database:/var/lib/mysql
+    ports:
+      - 3306:3306
+    networks:
+      - server-database
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    image: spit_management_server
+    container_name: spit_management_server
+    command: npm run development
+    volumes:
+      - ./server/:/usr/app/server
+      - ./server/package.json:/usr/app/server/package.json
+      - ./server/package-lock.json:/usr/app/server/package-lock.json
+      - back-notused:/usr/app/server/node_modules
+    ports: 
+      - 3000:3000
+    depends_on:
+      - database
+    networks:
+      - server-database
+
+  client:
+    build: 
+      context: ./client
+      dockerfile: Dockerfile
+    image: spit_management_client
+    container_name: spit_management_client
+    command: npm start
+    volumes:
+      - ./client/:/usr/app/client
+      - ./server/package.json:/usr/app/server/package.json
+      - ./server/package-lock.json:/usr/app/server/package-lock.json
+      - /usr/app/client/node_modules
+    ports: 
+      - 3001:3001
+
+volumes:
+  back-notused:
+
+networks:
+  server-database:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16
+          ip_range: 172.28.5.0/24
+          gateway: 172.28.5.254
+          aux_addresses:
+            host1: 172.28.1.5
+            host2: 172.28.1.6
+            host3: 172.28.1.7
