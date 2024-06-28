@@ -1,9 +1,18 @@
 import { useState } from "react";
 import axios from "axios";
+import Cookies from "universal-cookie";
+import ToastContainer from "react-bootstrap/ToastContainer";
+import MyToast, { ToastStatus } from "../../components/Toast";
+import { useNavigate } from "react-router-dom";
+
+const cookies = new Cookies();
 
 export default function LoginPage() {
+    const navigate = useNavigate();
+
     const [username, setUsername] = useState(null);
     const [password, setPassword] = useState(null);
+    const [messages, setMessages] = useState([]);
 
     const handleLogin = async () => {
         axios
@@ -12,12 +21,37 @@ export default function LoginPage() {
                 password,
             })
             .then((response) => {
-                if (response.status === 200) {
-                    alert(response.data.refreshToken);
+                if (response.data.status === "success") {
+                    const tokens = response.data.data;
+
+                    cookies.set("access_token", tokens.accessToken.token, {
+                        expires: new Date(
+                            Date.now() + tokens.accessToken.expired * 1000
+                        ),
+                        sameSite: true,
+                        secure: true,
+                    });
+
+                    cookies.set("refresh_token", tokens.refreshToken.token, {
+                        expires: new Date(
+                            Date.now() + tokens.refreshToken.expired * 1000
+                        ),
+                        sameSite: true,
+                        secure: true,
+                    });
                 }
+
+                navigate("/");
             })
             .catch(function (error) {
-                alert(error);
+                const message = {
+                    title: `Đăng nhập thất bại`,
+                    message: error.response.data.message,
+                    status: ToastStatus.DANGER,
+                };
+
+                const newMessages = [message, ...messages];
+                setMessages(newMessages);
             });
     };
 
@@ -117,6 +151,18 @@ export default function LoginPage() {
                         </div>
                     </div>
                 </div>
+
+                <ToastContainer position="top-end" className="m-3">
+                    {messages.map((data, index) => (
+                        <MyToast
+                            key={index}
+                            title={data.title}
+                            autoHide={true}
+                            message={data.message}
+                            status={data.status}
+                        ></MyToast>
+                    ))}
+                </ToastContainer>
             </div>
         </>
     );
