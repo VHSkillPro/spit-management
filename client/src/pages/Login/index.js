@@ -14,7 +14,7 @@ export default function LoginPage() {
     const [password, setPassword] = useState(null);
     const [messages, setMessages] = useState([]);
 
-    const handleLogin = async () => {
+    const handleLogin = () => {
         axios
             .post("//localhost:3000/api/v1/auth/login", {
                 username,
@@ -85,7 +85,7 @@ export default function LoginPage() {
                                         className="form-control"
                                         placeholder="Tên đăng nhập"
                                         onChange={(e) =>
-                                            setUsername(e.target.value)
+                                            setUsername(e.target.value || null)
                                         }
                                     />
                                     <div className="input-group-text">
@@ -102,7 +102,7 @@ export default function LoginPage() {
                                         className="form-control"
                                         placeholder="Mật khẩu"
                                         onChange={(e) =>
-                                            setPassword(e.target.value)
+                                            setPassword(e.target.value || null)
                                         }
                                     />
                                     <div className="input-group-text">
