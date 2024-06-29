@@ -23,27 +23,25 @@ export default function LoginPage() {
                 password,
             })
             .then((response) => {
-                if (response.data.status === "success") {
-                    const tokens = response.data.data;
+                const data = response.data.data;
 
-                    cookies.set("access_token", tokens.accessToken.token, {
-                        expires: new Date(
-                            Date.now() + tokens.accessToken.expired * 1000
-                        ),
-                        sameSite: true,
-                        secure: true,
-                    });
+                cookies.set("access_token", data.accessToken.token, {
+                    expires: new Date(
+                        Date.now() + data.accessToken.expired * 1000
+                    ),
+                    sameSite: true,
+                    secure: true,
+                });
 
-                    cookies.set("refresh_token", tokens.refreshToken.token, {
-                        expires: new Date(
-                            Date.now() + tokens.refreshToken.expired * 1000
-                        ),
-                        sameSite: true,
-                        secure: true,
-                    });
+                cookies.set("refresh_token", data.refreshToken.token, {
+                    expires: new Date(
+                        Date.now() + data.refreshToken.expired * 1000
+                    ),
+                    sameSite: true,
+                    secure: true,
+                });
 
-                    login();
-                }
+                login(data.username);
             })
             .catch(function (error) {
                 const message = {
