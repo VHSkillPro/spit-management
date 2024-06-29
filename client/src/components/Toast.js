@@ -35,6 +35,9 @@ function MyToast({ title, message, status, autoHide }) {
 
             case ToastStatus.INFO:
                 return <i class="bi bi-info-circle text-primary fs-4"></i>;
+
+            default:
+                break;
         }
     };
 

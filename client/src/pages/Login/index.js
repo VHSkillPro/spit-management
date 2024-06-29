@@ -4,11 +4,13 @@ import Cookies from "universal-cookie";
 import ToastContainer from "react-bootstrap/ToastContainer";
 import MyToast, { ToastStatus } from "../../components/Toast";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 const cookies = new Cookies();
 
 export default function LoginPage() {
     const navigate = useNavigate();
+    const { login } = useAuth();
 
     const [username, setUsername] = useState(null);
     const [password, setPassword] = useState(null);
@@ -39,9 +41,9 @@ export default function LoginPage() {
                         sameSite: true,
                         secure: true,
                     });
-                }
 
-                navigate("/");
+                    login();
+                }
             })
             .catch(function (error) {
                 const message = {
@@ -155,7 +157,7 @@ export default function LoginPage() {
                 <ToastContainer position="top-end" className="m-3">
                     {messages.map((data, index) => (
                         <MyToast
-                            key={index}
+                            key={messages.length - index - 1}
                             title={data.title}
                             autoHide={true}
                             message={data.message}
