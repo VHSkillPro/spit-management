@@ -217,6 +217,7 @@ const refreshAccessToken = async (req, res) => {
         return res.status(HTTP_STATUS_CODE.OK).send({
             status: "success",
             data: {
+                username: user.username,
                 accessToken: {
                     token: newAccessToken,
                     expired: parseInt(process.env.AT_LIFE),
