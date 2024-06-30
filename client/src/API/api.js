@@ -66,6 +66,8 @@ api.interceptors.response.use(
                     return api(originRequest);
                 }
             }
+
+            isRefreshTokens = false;
         }
 
         return Promise.reject(error);
