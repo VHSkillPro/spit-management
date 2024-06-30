@@ -12,7 +12,6 @@ services:
   database:
     image: mysql:latest
     container_name: spit_management_database
-    restart: always
     environment:
       - MYSQL_ROOT_PASSWORD=a112233
     volumes:
@@ -50,14 +49,15 @@ services:
     command: npm start
     volumes:
       - ./client/:/usr/app/client
-      - ./server/package.json:/usr/app/server/package.json
-      - ./server/package-lock.json:/usr/app/server/package-lock.json
-      - /usr/app/client/node_modules
+      - ./client/package.json:/usr/app/client/package.json
+      - ./client/package-lock.json:/usr/app/client/package-lock.json
+      - client-notused:/usr/app/client/node_modules
     ports: 
       - 3001:3001
 
 volumes:
   back-notused:
+  client-notused:
 
 networks:
   server-database:
