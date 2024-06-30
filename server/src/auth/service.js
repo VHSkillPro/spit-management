@@ -58,15 +58,8 @@ const login = async (req, res) => {
         return res.status(HTTP_STATUS_CODE.OK).send({
             status: "success",
             data: {
-                username: user.username,
-                accessToken: {
-                    token: accessToken,
-                    expired: parseInt(process.env.AT_LIFE),
-                },
-                refreshToken: {
-                    token: refreshToken,
-                    expired: parseInt(process.env.RT_LIFE),
-                },
+                access_token: accessToken,
+                refresh_token: refreshToken,
             },
             message: "Đăng nhập thành công",
         });
@@ -125,37 +118,42 @@ const register = async (req, res) => {
         // Return response
         return res.status(HTTP_STATUS_CODE.CREATED).send({
             status: "success",
-            data: {
-                username: username,
-                password: password,
-            },
-            message: "Register successfully.",
+            message: "Đăng ký tài khoản thành công",
         });
     } catch (error) {
         console.log(error);
 
         return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send({
             status: "error",
-            message: "Internal Server Error.",
+            message: "Lỗi máy chủ",
         });
     }
 };
 
 /**
- * Retrieves the current user's information and sends a success response with the user's username.
- *
- * @param {express.Request} req - The request object.
- * @param {express.Response} res - The response object.
+ * Handles an HTTP request to retrieve the current user's information.
+ * Responds with a JSON object containing the user's username and a success message.
+ * @param {express.Request} req - The HTTP request object, which contains user information.
+ * @param {express.Response} res - The HTTP response object used to send back the desired HTTP response.
  * @returns {Object} The response object with status, data (containing username), and message.
  */
 const me = async (req, res) => {
-    return res.status(HTTP_STATUS_CODE.OK).send({
-        status: "success",
-        data: {
-            username: req.user.username,
-        },
-        message: "Get user successfully.",
-    });
+    try {
+        return res.status(HTTP_STATUS_CODE.OK).send({
+            status: "success",
+            data: {
+                username: req.username,
+            },
+            message: "Get user successfully",
+        });
+    } catch (error) {
+        console.log(error);
+
+        return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send({
+            status: "error",
+            message: "Lỗi máy chủ",
+        });
+    }
 };
 
 /**
@@ -166,14 +164,15 @@ const me = async (req, res) => {
  * @returns {Object} - Returns a response with the new access token and refresh token if successful,
  * or an error response if any issues occur during the process.
  */
-const refreshAccessToken = async (req, res) => {
+const refreshTokens = async (req, res) => {
     try {
-        const refreshToken = req.body.refreshToken;
+        const authHeader = req.headers["Authorization"];
+        const refreshToken = authHeader && authHeader.split(" ")[1];
 
         if (!refreshToken) {
-            return res.status(HTTP_STATUS_CODE.BAD_REQUEST).send({
+            return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).send({
                 status: "error",
-                message: "Invalid request data.",
+                message: "Không tìm thấy refresh token",
             });
         }
 
@@ -181,17 +180,18 @@ const refreshAccessToken = async (req, res) => {
         if (!verified) {
             return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).send({
                 status: "error",
-                message: "Invalid or expired refresh token.",
+                message: "Refresh token hết hạn hoặc không hợp lệ",
             });
         }
 
         const user = await db.User.findOne({
             where: { refreshToken: refreshToken },
         });
+
         if (!user) {
-            return res.status(HTTP_STATUS_CODE.NOT_FOUND).send({
+            return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).send({
                 status: "error",
-                message: "Refresh token not found.",
+                message: "Refresh token hết hạn hoặc không hợp lệ",
             });
         }
 
@@ -217,24 +217,17 @@ const refreshAccessToken = async (req, res) => {
         return res.status(HTTP_STATUS_CODE.OK).send({
             status: "success",
             data: {
-                username: user.username,
-                accessToken: {
-                    token: newAccessToken,
-                    expired: parseInt(process.env.AT_LIFE),
-                },
-                refreshToken: {
-                    token: newRefreshToken,
-                    expired: parseInt(process.env.RT_LIFE),
-                },
+                accessToken: newAccessToken,
+                refreshToken: newRefreshToken,
             },
-            message: "Refresh access token successfully.",
+            message: "Làm mới tokens thành công",
         });
     } catch (error) {
         console.log(error);
 
         return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send({
             status: "error",
-            message: "Internal Server Error.",
+            message: "Lỗi máy chủ",
         });
     }
 };
@@ -294,7 +287,7 @@ const logout = async (req, res) => {
 
         return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send({
             status: "error",
-            message: "Internal Server Error.",
+            message: "Lỗi máy chủ",
         });
     }
 };
@@ -303,6 +296,6 @@ module.exports = {
     login,
     register,
     me,
-    refreshAccessToken,
+    refreshTokens,
     logout,
 };

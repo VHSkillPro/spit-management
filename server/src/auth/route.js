@@ -7,7 +7,7 @@ const middleware = require("./middleware");
 router.get("/me", middleware.isAuthenticated, service.me);
 
 router.post("/logout", service.logout);
-router.post("/refresh_token", service.refreshAccessToken);
+router.post("/refresh_tokens", service.refreshTokens);
 router.post("/login", validate.validateLogin, service.login);
 router.post("/register", validate.validateRegister, service.register);
 
