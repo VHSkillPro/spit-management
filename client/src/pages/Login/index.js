@@ -9,7 +9,6 @@ import { useAuth } from "../../contexts/AuthContext";
 const cookies = new Cookies();
 
 export default function LoginPage() {
-    const navigate = useNavigate();
     const { login } = useAuth();
 
     const [username, setUsername] = useState(null);
@@ -25,23 +24,17 @@ export default function LoginPage() {
             .then((response) => {
                 const data = response.data.data;
 
-                cookies.set("access_token", data.accessToken.token, {
-                    expires: new Date(
-                        Date.now() + data.accessToken.expired * 1000
-                    ),
+                cookies.set("access_token", data.access_token, {
                     sameSite: true,
                     secure: true,
                 });
 
-                cookies.set("refresh_token", data.refreshToken.token, {
-                    expires: new Date(
-                        Date.now() + data.refreshToken.expired * 1000
-                    ),
+                cookies.set("refresh_token", data.refresh_token, {
                     sameSite: true,
                     secure: true,
                 });
 
-                login(data.username);
+                login(username);
             })
             .catch(function (error) {
                 const message = {
