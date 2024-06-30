@@ -12,7 +12,7 @@ const { verifyAT } = require("../../utils/jwt");
  */
 const isAuthenticated = async (req, res, next) => {
     try {
-        const authHeader = req.headers["Authorization"];
+        const authHeader = req.headers["authorization"];
         const accessToken = authHeader && authHeader.split(" ")[1];
 
         if (!accessToken) {

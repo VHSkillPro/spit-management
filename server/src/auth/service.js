@@ -166,7 +166,7 @@ const me = async (req, res) => {
  */
 const refreshTokens = async (req, res) => {
     try {
-        const authHeader = req.headers["Authorization"];
+        const authHeader = req.headers["authorization"];
         const refreshToken = authHeader && authHeader.split(" ")[1];
 
         if (!refreshToken) {
@@ -217,8 +217,8 @@ const refreshTokens = async (req, res) => {
         return res.status(HTTP_STATUS_CODE.OK).send({
             status: "success",
             data: {
-                accessToken: newAccessToken,
-                refreshToken: newRefreshToken,
+                access_token: newAccessToken,
+                refresh_token: newRefreshToken,
             },
             message: "Làm mới tokens thành công",
         });
