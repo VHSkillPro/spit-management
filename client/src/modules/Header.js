@@ -1,8 +1,19 @@
 import { Button, Container } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext";
+import { logoutAPI } from "../API/authService";
 
 export default function Header({ toggleSideBar }) {
-    const { logout } = useAuth();
+    const { user, logout } = useAuth();
+
+    const handleLogout = () => {
+        logoutAPI()
+            .then(() => {
+                logout();
+            })
+            .catch((error) => {
+                alert(error);
+            });
+    };
 
     return (
         <nav className="app-header navbar navbar-expand bg-body">
@@ -32,7 +43,7 @@ export default function Header({ toggleSideBar }) {
                                 alt="User Image"
                             />
                             <span className="d-none d-md-inline">
-                                Alexander Pierce
+                                {user.current.username}
                             </span>
                         </a>
                         <ul className="dropdown-menu dropdown-menu-lg dropdown-menu-end">
@@ -43,23 +54,9 @@ export default function Header({ toggleSideBar }) {
                                     alt="User Image"
                                 />
                                 <p>
-                                    Alexander Pierce - Web Developer
+                                    {user.current.username}
                                     <small>Member since Nov. 2023</small>
                                 </p>
-                            </li>
-
-                            <li className="user-body">
-                                <div className="row">
-                                    <div className="col-4 text-center">
-                                        <a href="#">Followers</a>
-                                    </div>
-                                    <div className="col-4 text-center">
-                                        <a href="#">Sales</a>
-                                    </div>
-                                    <div className="col-4 text-center">
-                                        <a href="#">Friends</a>
-                                    </div>
-                                </div>
                             </li>
 
                             <li className="user-footer">
@@ -69,8 +66,11 @@ export default function Header({ toggleSideBar }) {
                                 >
                                     Profile
                                 </a>
-                                <Button className="float-end" onClick={logout}>
-                                    Sign out
+                                <Button
+                                    className="float-end"
+                                    onClick={handleLogout}
+                                >
+                                    Logout
                                 </Button>
                             </li>
                         </ul>

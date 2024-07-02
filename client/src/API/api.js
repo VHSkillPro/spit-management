@@ -1,6 +1,6 @@
 import axios from "axios";
 import Cookies from "universal-cookie";
-import { refreshTokens } from "./authService";
+import { refreshTokensAPI } from "./authService";
 
 const cookies = new Cookies();
 
@@ -43,25 +43,28 @@ api.interceptors.response.use(
             const refreshToken = cookies.get("refresh_token");
 
             if (refreshToken) {
-                const response = await refreshTokens();
+                const response = await refreshTokensAPI();
 
                 if (response) {
-                    cookies.set("access_token", response.data.access_token, {
-                        sameSite: true,
-                        secure: true,
-                    });
+                    cookies.set(
+                        "access_token",
+                        response.data.data.access_token,
+                        {
+                            sameSite: true,
+                            secure: true,
+                        }
+                    );
 
-                    cookies.set("refresh_token", response.data.refresh_token, {
-                        sameSite: true,
-                        secure: true,
-                    });
+                    cookies.set(
+                        "refresh_token",
+                        response.data.data.refresh_token,
+                        {
+                            sameSite: true,
+                            secure: true,
+                        }
+                    );
 
                     isRefreshTokens = false;
-
-                    originRequest.headers[
-                        "Authorization"
-                    ] = `Bearer ${response.data.access_token}`;
-
                     return api(originRequest);
                 }
             }

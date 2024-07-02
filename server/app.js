@@ -22,8 +22,10 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Register router - begin
 const authRouter = require("./src/auth/route");
+const userRouter = require("./src/user/route");
 
-app.use("/api/v1/auth/", authRouter);
+app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/users", userRouter);
 // Register router - end
 
 module.exports = app;

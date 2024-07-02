@@ -1,6 +1,4 @@
 import { useState } from "react";
-import axios from "axios";
-import Cookies from "universal-cookie";
 import ToastContainer from "react-bootstrap/ToastContainer";
 import MyToast, { ToastStatus } from "../../components/Toast";
 import { useAuth } from "../../contexts/AuthContext";
@@ -14,8 +12,7 @@ import {
     Row,
 } from "react-bootstrap";
 import InputGroupText from "react-bootstrap/esm/InputGroupText";
-
-const cookies = new Cookies();
+import { loginAPI } from "../../API/authService";
 
 export default function LoginPage() {
     const { login } = useAuth();
@@ -25,11 +22,7 @@ export default function LoginPage() {
     const [messages, setMessages] = useState([]);
 
     const handleLogin = () => {
-        axios
-            .post("//localhost:3000/api/v1/auth/login", {
-                username,
-                password,
-            })
+        loginAPI(username, password)
             .then((response) => {
                 const data = response.data.data;
                 login(username, data.access_token, data.refresh_token);

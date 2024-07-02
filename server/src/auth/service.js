@@ -74,63 +74,6 @@ const login = async (req, res) => {
 };
 
 /**
- * Register a new user with the provided username and password.
- *
- * @param {express.Request} req - The request object
- * @param {express.Response} res - The response object
- * @returns {Object} - Returns a response with status and message
- */
-const register = async (req, res) => {
-    try {
-        // Handle form errors
-        const errors = validationResult(req);
-
-        if (!errors.isEmpty()) {
-            return res.status(HTTP_STATUS_CODE.BAD_REQUEST).send({
-                status: "error",
-                message: "Invalid request data.",
-            });
-        }
-
-        // Check username is exist
-        const { username, password } = req.body;
-        const user = await db.User.findOne({ where: { username: username } });
-
-        if (user) {
-            return res.status(HTTP_STATUS_CODE.CONFLICT).send({
-                status: "error",
-                message: "Tên tài khoản đã tồn tại",
-            });
-        }
-
-        // Register successfully
-        const saltRounds = 10;
-        const hashPassword = bcrypt.hashSync(password, saltRounds);
-
-        // Insert user to database
-        await db.User.create({
-            username: username,
-            password: hashPassword,
-            role: 0,
-            refreshToken: null,
-        });
-
-        // Return response
-        return res.status(HTTP_STATUS_CODE.CREATED).send({
-            status: "success",
-            message: "Đăng ký tài khoản thành công",
-        });
-    } catch (error) {
-        console.log(error);
-
-        return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send({
-            status: "error",
-            message: "Lỗi máy chủ",
-        });
-    }
-};
-
-/**
  * Handles an HTTP request to retrieve the current user's information.
  * Responds with a JSON object containing the user's username and a success message.
  * @param {express.Request} req - The HTTP request object, which contains user information.
@@ -241,46 +184,19 @@ const refreshTokens = async (req, res) => {
  */
 const logout = async (req, res) => {
     try {
-        const refreshToken = req.body.refreshToken;
-
-        if (!refreshToken) {
-            return res.status(HTTP_STATUS_CODE.BAD_REQUEST).send({
-                status: "error",
-                message: "Invalid request data.",
-            });
-        }
-
-        const verified = verifyRT(refreshToken);
-        if (!verified) {
-            return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).send({
-                status: "error",
-                message: "Invalid or expired refresh token.",
-            });
-        }
-
-        const user = await db.User.findOne({
-            where: { refreshToken: refreshToken },
-        });
-        if (!user) {
-            return res.status(HTTP_STATUS_CODE.NOT_FOUND).send({
-                status: "error",
-                message: "Refresh token not found.",
-            });
-        }
-
         // Delete refreshToken in database
         await db.User.update(
             { refreshToken: null },
             {
                 where: {
-                    username: user.username,
+                    username: req.username,
                 },
             }
         );
 
         return res.status(HTTP_STATUS_CODE.OK).send({
             status: "success",
-            message: "Logged out successfully.",
+            message: "Đăng xuất thành công",
         });
     } catch (error) {
         console.log(error);
@@ -293,9 +209,8 @@ const logout = async (req, res) => {
 };
 
 module.exports = {
-    login,
-    register,
     me,
     refreshTokens,
+    login,
     logout,
 };

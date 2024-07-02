@@ -1,13 +1,19 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import api from "../API/api";
+import React, {
+    createContext,
+    useContext,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
 import Cookies from "universal-cookie";
+import { meAPI } from "../API/authService";
 
 const cookies = new Cookies();
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+    const user = useRef({ username: null });
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [username, setUsername] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -15,9 +21,13 @@ export const AuthProvider = ({ children }) => {
             return;
         }
 
-        api.get("v1/auth/me")
+        meAPI()
             .then((response) => {
-                login(response.data.data.username);
+                user.current = {
+                    username: response.data.data.username,
+                };
+
+                setIsAuthenticated(true);
                 setIsLoading(false);
             })
             .catch((error) => {
@@ -36,14 +46,21 @@ export const AuthProvider = ({ children }) => {
             secure: true,
         });
 
-        setUsername(username);
+        user.current = {
+            username: username,
+        };
+
         setIsAuthenticated(true);
     };
 
     const logout = () => {
         cookies.remove("access_token");
         cookies.remove("refresh_token");
-        setUsername(null);
+
+        user.current = {
+            username: null,
+        };
+
         setIsAuthenticated(false);
     };
 
@@ -52,9 +69,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     return (
-        <AuthContext.Provider
-            value={{ isAuthenticated, username, login, logout }}
-        >
+        <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
