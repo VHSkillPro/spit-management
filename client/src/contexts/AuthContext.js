@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import Cookies from "universal-cookie";
 import api from "../API/api";
+import Cookies from "universal-cookie";
 
 const cookies = new Cookies();
 export const AuthContext = createContext();
@@ -25,12 +25,24 @@ export const AuthProvider = ({ children }) => {
             });
     });
 
-    const login = (username) => {
+    const login = (username, accessToken, refreshToken) => {
+        cookies.set("access_token", accessToken, {
+            sameSite: true,
+            secure: true,
+        });
+
+        cookies.set("refresh_token", refreshToken, {
+            sameSite: true,
+            secure: true,
+        });
+
         setUsername(username);
         setIsAuthenticated(true);
     };
 
     const logout = () => {
+        cookies.remove("access_token");
+        cookies.remove("refresh_token");
         setUsername(null);
         setIsAuthenticated(false);
     };

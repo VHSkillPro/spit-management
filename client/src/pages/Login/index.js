@@ -3,8 +3,17 @@ import axios from "axios";
 import Cookies from "universal-cookie";
 import ToastContainer from "react-bootstrap/ToastContainer";
 import MyToast, { ToastStatus } from "../../components/Toast";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import {
+    Button,
+    Card,
+    CardBody,
+    Col,
+    FormControl,
+    InputGroup,
+    Row,
+} from "react-bootstrap";
+import InputGroupText from "react-bootstrap/esm/InputGroupText";
 
 const cookies = new Cookies();
 
@@ -23,18 +32,7 @@ export default function LoginPage() {
             })
             .then((response) => {
                 const data = response.data.data;
-
-                cookies.set("access_token", data.access_token, {
-                    sameSite: true,
-                    secure: true,
-                });
-
-                cookies.set("refresh_token", data.refresh_token, {
-                    sameSite: true,
-                    secure: true,
-                });
-
-                login(username);
+                login(username, data.access_token, data.refresh_token);
             })
             .catch(function (error) {
                 const message = {
@@ -51,7 +49,7 @@ export default function LoginPage() {
     return (
         <>
             <div className="login-page bg-body-secondary">
-                <div className="login-box" style={{ width: 25 + "rem" }}>
+                <div className="login-box" style={{ width: "25rem" }}>
                     {/* Logo */}
                     <div className="login-logo mb-5">
                         <a href="#">
@@ -68,81 +66,65 @@ export default function LoginPage() {
                     </div>
 
                     {/* Login Card */}
-                    <div className="card w-100 rounded-3">
-                        <div className="card-body login-card-body rounded-3">
+                    <Card className="w-100 rounded-3">
+                        <CardBody className="login-card-body rounded-3">
                             <div className="mb-3">
-                                <div className="input-group">
-                                    <input
+                                <InputGroup>
+                                    <FormControl
                                         name="username"
                                         type="text"
-                                        className="form-control"
                                         placeholder="Tên đăng nhập"
-                                        onChange={(e) =>
-                                            setUsername(e.target.value || null)
-                                        }
-                                    />
-                                    <div className="input-group-text">
+                                        onChange={(e) => {
+                                            setUsername(e.target.value || null);
+                                        }}
+                                    ></FormControl>
+                                    <InputGroupText>
                                         <span className="bi bi-person" />
-                                    </div>
-                                </div>
+                                    </InputGroupText>
+                                </InputGroup>
                             </div>
-
                             <div className="mb-3">
-                                <div className="input-group">
-                                    <input
+                                <InputGroup>
+                                    <FormControl
                                         name="password"
                                         type="password"
-                                        className="form-control"
                                         placeholder="Mật khẩu"
-                                        onChange={(e) =>
-                                            setPassword(e.target.value || null)
-                                        }
-                                    />
-                                    <div className="input-group-text">
+                                        onChange={(e) => {
+                                            setPassword(e.target.value || null);
+                                        }}
+                                    ></FormControl>
+                                    <InputGroupText>
                                         <span className="bi bi-lock-fill" />
-                                    </div>
-                                </div>
+                                    </InputGroupText>
+                                </InputGroup>
                             </div>
-
-                            <div className="row">
-                                <div className="col-12">
+                            <Row>
+                                <Col xs={12}>
                                     <div className="d-grid gap-2">
-                                        <button
+                                        <Button
+                                            variant="primary"
                                             onClick={handleLogin}
-                                            className="btn btn-primary"
                                         >
                                             <i className="bi bi-box-arrow-in-right me-2"></i>
                                             Đăng nhập
-                                        </button>
+                                        </Button>
                                     </div>
-                                </div>
-                            </div>
-
-                            <div className="row mt-3">
-                                <div className="col-6">
+                                </Col>
+                            </Row>
+                            <Row className="mt-3">
+                                <Col xs={6}>
                                     <p>
                                         <a
-                                            href="forgot-password.html"
+                                            href="#"
                                             className="text-decoration-none"
                                         >
                                             Quên mật khẩu
                                         </a>
                                     </p>
-                                </div>
-
-                                <div className="col-6 d-flex justify-content-end">
-                                    <p>
-                                        <a
-                                            href="register.html"
-                                            className="text-center text-decoration-none"
-                                        >
-                                            Đăng ký tài khoản
-                                        </a>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                </Col>
+                            </Row>
+                        </CardBody>
+                    </Card>
                 </div>
 
                 <ToastContainer position="top-end" className="m-3">

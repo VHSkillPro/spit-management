@@ -45,7 +45,6 @@ api.interceptors.response.use(
             if (refreshToken) {
                 const response = await refreshTokens();
 
-                console.log(response);
                 if (response) {
                     cookies.set("access_token", response.data.access_token, {
                         sameSite: true,
