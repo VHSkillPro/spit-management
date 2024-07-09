@@ -73,7 +73,36 @@ const create = async (req, res) => {
     }
 };
 
+const destroy = async (req, res) => {
+    try {
+        const username = req.params.username;
+        const user = await db.User.findOne({ where: { username: username } });
+
+        if (!user) {
+            return res.status(HTTP_STATUS_CODE.NOT_FOUND).send({
+                status: "error",
+                message: "Không tìm thấy tài nguyên",
+            });
+        }
+
+        await db.User.destroy({ where: { username: username } });
+
+        return res.status(HTTP_STATUS_CODE.NO_CONTENT).send({
+            status: "success",
+            message: "Xoá tài khoản thành công",
+        });
+    } catch (error) {
+        console.log(error);
+
+        return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send({
+            status: "error",
+            message: "Lỗi máy chủ",
+        });
+    }
+};
+
 module.exports = {
     index,
     create,
+    destroy,
 };

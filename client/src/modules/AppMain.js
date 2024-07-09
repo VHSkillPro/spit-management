@@ -1,19 +1,19 @@
-export default function AppMain() {
+export default function AppMain({ child }) {
     return (
-        <main class="app-main">
-            <div class="app-content-header">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <h3 class="mb-0">Dashboard v3</h3>
+        <main className="app-main">
+            <div className="app-content-header">
+                <div className="container-fluid">
+                    <div className="row">
+                        <div className="col-sm-6">
+                            <h3 className="mb-0">Dashboard v3</h3>
                         </div>
-                        <div class="col-sm-6">
-                            <ol class="breadcrumb float-sm-end">
-                                <li class="breadcrumb-item">
+                        <div className="col-sm-6">
+                            <ol className="breadcrumb float-sm-end">
+                                <li className="breadcrumb-item">
                                     <a href="#">Home</a>
                                 </li>
                                 <li
-                                    class="breadcrumb-item active"
+                                    className="breadcrumb-item active"
                                     aria-current="page"
                                 >
                                     Dashboard v3
@@ -23,7 +23,7 @@ export default function AppMain() {
                     </div>
                 </div>
             </div>
-            <div class="app-content"></div>
+            <div className="app-content">{child}</div>
         </main>
     );
 }
