@@ -173,7 +173,7 @@ export default function ListUser() {
                                                                     ).length ===
                                                                     users.length
                                                                 }
-                                                                onClick={
+                                                                onChange={
                                                                     handleToggleAllUsers
                                                                 }
                                                             ></input>
@@ -189,7 +189,23 @@ export default function ListUser() {
                                             <tbody>{renderUsers()}</tbody>
                                             <tfoot>
                                                 <tr>
-                                                    <th></th>
+                                                    <th>
+                                                        <div className="d-flex justify-content-center">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="form-check-input"
+                                                                checked={
+                                                                    Object.keys(
+                                                                        chooseUsers
+                                                                    ).length ===
+                                                                    users.length
+                                                                }
+                                                                onChange={
+                                                                    handleToggleAllUsers
+                                                                }
+                                                            ></input>
+                                                        </div>
+                                                    </th>
                                                     <th>STT</th>
                                                     <th>Tên tài khoản</th>
                                                     <th>Mật khẩu</th>
@@ -203,12 +219,12 @@ export default function ListUser() {
                                 <Row>
                                     <Col sm={12} md={5}>
                                         <div className="dataTables_info">
-                                            {`Showing ${
+                                            {`Hiển thị ${
                                                 (page - 1) * pageSize + 1
-                                            } to ${Math.min(
+                                            } đến ${Math.min(
                                                 page * pageSize,
                                                 users.length
-                                            )} of ${users.length} entries`}
+                                            )} trong ${users.length} tài khoản`}
                                         </div>
                                     </Col>
                                     <Col sm={12} md={7}>

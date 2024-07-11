@@ -43,11 +43,11 @@ export default function ListUserItem({
                         type="checkbox"
                         className="form-check-input"
                         checked={isChoose ? true : false}
-                        onClick={onChoose}
+                        onChange={onChoose}
                     ></input>
                 </div>
             </td>
-            <td className="text-center">{id + 1}</td>
+            <td>{id + 1}</td>
             <td>{username}</td>
             <td>{password}</td>
             <td>{role}</td>
@@ -57,7 +57,7 @@ export default function ListUserItem({
                         Đổi chức vụ
                     </Button>
                     <Button size="sm" className="me-2" title="Đổi mật khẩu">
-                        <i class="bi bi-key"></i>
+                        <i className="bi bi-key"></i>
                     </Button>
                     <Button
                         size="sm"
