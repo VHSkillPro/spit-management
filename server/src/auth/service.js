@@ -6,15 +6,18 @@ const { validationResult } = require("express-validator");
 const HTTP_STATUS_CODE = require("../../utils/httpStatusCode");
 
 /**
- * Function to handle user login process.
+ * API đăng nhập
  *
- * @param {express.Request} req - The request object.
- * @param {express.Response} res - The response object.
- * @returns {Object} The response object with user information and tokens.
+ * URI: /api/v1/auth/login
+ *
+ * Method: POST
+ *
+ * @param {express.Request} req
+ * @param {express.Response} res
  */
 const login = async (req, res) => {
     try {
-        // Handle form errors
+        // Kiểm tra tính đúng đắn của dữ liệu
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
@@ -24,11 +27,11 @@ const login = async (req, res) => {
             });
         }
 
-        // Get user from database
+        // Lấy user từ database
         const { username, password } = req.body;
         let user = await db.User.findOne({ where: { username: username } });
 
-        // Check user is not exist or password incorrect
+        // Nếu user không tồn tại hoặc sai mật khẩu
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).send({
                 status: "error",
@@ -36,7 +39,7 @@ const login = async (req, res) => {
             });
         }
 
-        // Generator accessToken and refreshToken
+        // Tạo ra accessToken và refreshToken
         const payload = {
             username: user.username,
         };
@@ -44,17 +47,19 @@ const login = async (req, res) => {
         const accessToken = generateAT(payload);
         const refreshToken = generateRT(payload);
 
-        // Update refreshToken in database
-        await db.User.update(
-            { refreshToken: refreshToken },
-            {
-                where: {
-                    username: user.username,
-                },
-            }
-        );
+        // Cập nhập refreshToken vào database
+        await db.sequelize.transaction(async (t) => {
+            await db.User.update(
+                { refreshToken: refreshToken },
+                {
+                    where: {
+                        username: user.username,
+                    },
+                }
+            );
+        });
 
-        // Return response
+        // Trả về thông báo đăng nhập thành công
         return res.status(HTTP_STATUS_CODE.OK).send({
             status: "success",
             data: {
@@ -74,14 +79,18 @@ const login = async (req, res) => {
 };
 
 /**
- * Handles an HTTP request to retrieve the current user's information.
- * Responds with a JSON object containing the user's username and a success message.
- * @param {express.Request} req - The HTTP request object, which contains user information.
- * @param {express.Response} res - The HTTP response object used to send back the desired HTTP response.
- * @returns {Object} The response object with status, data (containing username), and message.
+ * API trả về thông tin người dùng hiện tại
+ *
+ * URI: /api/v1/auth/me
+ *
+ * Method: GET
+ *
+ * @param {express.Request} req
+ * @param {express.Response} res
  */
 const me = async (req, res) => {
     try {
+        // Trả về thông tin người dùng hiện tại
         return res.status(HTTP_STATUS_CODE.OK).send({
             status: "success",
             data: {
@@ -100,18 +109,22 @@ const me = async (req, res) => {
 };
 
 /**
- * Function to refresh access token based on the provided refresh token.
+ * API dùng để cấp lại accessToken dựa vào refreshToken
  *
- * @param {express.Request} req - The request object containing the refresh token in the body.
- * @param {express.Response} res - The response object to send back the new access token and refresh token.
- * @returns {Object} - Returns a response with the new access token and refresh token if successful,
- * or an error response if any issues occur during the process.
+ * URI: /api/v1/auth/refresh_tokens
+ *
+ * Method: POST
+ *
+ * @param {express.Request} req
+ * @param {express.Response} res
  */
 const refreshTokens = async (req, res) => {
     try {
+        // Lấy refreshToken đính kèm trong header
         const authHeader = req.headers["authorization"];
         const refreshToken = authHeader && authHeader.split(" ")[1];
 
+        // Nếu request không đính kèm refreshToken
         if (!refreshToken) {
             return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).send({
                 status: "error",
@@ -119,6 +132,7 @@ const refreshTokens = async (req, res) => {
             });
         }
 
+        // Kiểm tra tính hợp lệ của refreshToken
         const verified = verifyRT(refreshToken);
         if (!verified) {
             return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).send({
@@ -127,6 +141,7 @@ const refreshTokens = async (req, res) => {
             });
         }
 
+        // Tìm kiếm user cần cấp lại accessToken
         const user = await db.User.findOne({
             where: { refreshToken: refreshToken },
         });
@@ -138,7 +153,7 @@ const refreshTokens = async (req, res) => {
             });
         }
 
-        // Generator accessToken and refreshToken
+        // Tạo lại accessToken và refreshToken
         const payload = {
             username: user.username,
         };
@@ -146,17 +161,19 @@ const refreshTokens = async (req, res) => {
         const newAccessToken = generateAT(payload);
         const newRefreshToken = generateRT(payload);
 
-        // Update refreshToken in database
-        await db.User.update(
-            { refreshToken: newRefreshToken },
-            {
-                where: {
-                    username: user.username,
-                },
-            }
-        );
+        // Cập nhật refreshToken vào database
+        await db.sequelize.transaction(async (t) => {
+            await db.User.update(
+                { refreshToken: newRefreshToken },
+                {
+                    where: {
+                        username: user.username,
+                    },
+                }
+            );
+        });
 
-        // Return response
+        // Trả về thông báo làm mới token thành công
         return res.status(HTTP_STATUS_CODE.OK).send({
             status: "success",
             data: {
@@ -176,24 +193,30 @@ const refreshTokens = async (req, res) => {
 };
 
 /**
- * Logs out a user by invalidating the refresh token associated with the request.
+ * API dùng để logout người dùng hiện tại
  *
- * @param {express.Request} req - The request object containing the refresh token in the body.
- * @param {express.Response} res - The response object to send the result of the logout operation.
- * @returns {Object} - Returns a JSON response indicating the status of the logout operation.
+ * URI: /api/v1/auth/logout
+ *
+ * Method: POST
+ *
+ * @param {express.Request} req
+ * @param {express.Response} res
  */
 const logout = async (req, res) => {
     try {
-        // Delete refreshToken in database
-        await db.User.update(
-            { refreshToken: null },
-            {
-                where: {
-                    username: req.username,
-                },
-            }
-        );
+        // Xoá refreshToken của người dùng hiện tại trong database
+        await db.sequelize.transaction(async (t) => {
+            await db.User.update(
+                { refreshToken: null },
+                {
+                    where: {
+                        username: req.username,
+                    },
+                }
+            );
+        });
 
+        // Trả về thông báo đăng xuất thành công
         return res.status(HTTP_STATUS_CODE.OK).send({
             status: "success",
             message: "Đăng xuất thành công",

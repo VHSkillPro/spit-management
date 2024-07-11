@@ -3,18 +3,19 @@ const HTTP_STATUS_CODE = require("../../utils/httpStatusCode");
 const { verifyAT } = require("../../utils/jwt");
 
 /**
- * Middleware function to check authenticated.
+ * Middleware kiểm tra authenticated.
  *
- * @async
- * @param {express.Request} req - The request object
- * @param {express.Response} res - The response object
- * @param {express.NextFunction} next - The next middleware function
+ * @param {express.Request} req
+ * @param {express.Response} res
+ * @param {express.NextFunction} next
  */
 const isAuthenticated = async (req, res, next) => {
     try {
+        // Lấy accessToken từ header
         const authHeader = req.headers["authorization"];
         const accessToken = authHeader && authHeader.split(" ")[1];
 
+        // Nếu request không đính kèm accessToken
         if (!accessToken) {
             return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).send({
                 status: "error",
@@ -22,6 +23,7 @@ const isAuthenticated = async (req, res, next) => {
             });
         }
 
+        // Kiểm tra tính hợp lệ của accessToken
         const verified = verifyAT(accessToken);
         if (!verified) {
             return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).send({
@@ -30,7 +32,10 @@ const isAuthenticated = async (req, res, next) => {
             });
         }
 
+        // Đính thông tin về người dùng trong request
         req.username = verified.username;
+
+        // Đưa request tới tác vụ tiếp theo
         return next();
     } catch (error) {
         console.log(error);

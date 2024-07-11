@@ -1,11 +1,24 @@
+const express = require("express");
 const db = require("../../models");
 const HTTP_STATUS_CODE = require("../../utils/httpStatusCode");
 const { validationResult } = require("express-validator");
 
+/**
+ * API trả về danh sách users
+ *
+ * URI: /api/v1/users
+ *
+ * Method: GET
+ *
+ * @param {express.Request} req
+ * @param {express.Response} res
+ */
 const index = async (req, res) => {
     try {
+        // Lấy tất cả users
         const users = await db.User.findAll();
 
+        // Trả dữ liệu về cho client
         return res.status(HTTP_STATUS_CODE.OK).send({
             status: "success",
             data: {
@@ -73,10 +86,22 @@ const create = async (req, res) => {
     }
 };
 
+/**
+ * API xoá một user được chỉ định
+ *
+ * URI: /api/v1/users/:username
+ *
+ * Method: DELETE
+ *
+ * @param {express.Request} req
+ * @param {express.Response} res
+ */
 const destroy = async (req, res) => {
     try {
+        // Tên tài khoản cần xoá
         const username = req.params.username;
 
+        // Nếu tài khoản bị xoá trùng với tài khoản gởi yêu cầu
         if (username === req.username) {
             return res.status(HTTP_STATUS_CODE.CONFLICT).send({
                 status: "error",
@@ -84,6 +109,7 @@ const destroy = async (req, res) => {
             });
         }
 
+        // Kiểm tra tài khoản cần xoá có tồn tại ?
         const user = await db.User.findOne({ where: { username: username } });
 
         if (!user) {
@@ -93,8 +119,12 @@ const destroy = async (req, res) => {
             });
         }
 
-        await db.User.destroy({ where: { username: username } });
+        // Xoá user trong database
+        await db.sequelize.transaction(async (t) => {
+            await db.User.destroy({ where: { username: username } });
+        });
 
+        // Trả về thông báo xoá thành công
         return res.status(HTTP_STATUS_CODE.NO_CONTENT).send({
             status: "success",
             message: "Xoá tài khoản thành công",
