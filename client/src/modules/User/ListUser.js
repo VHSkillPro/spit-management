@@ -42,7 +42,10 @@ export default function ListUser() {
         getAllUsers()
             .then((response) => {
                 const usersFromAPI = response.data.data.users;
-                noPages.current = Math.floor(usersFromAPI.length / pageSize);
+                noPages.current = Math.ceil(usersFromAPI.length / pageSize);
+                if (page > noPages.current) {
+                    setPage(noPages.current);
+                }
                 setUsers(usersFromAPI);
                 setIsLoading(false);
             })
