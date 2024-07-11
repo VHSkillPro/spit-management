@@ -76,6 +76,14 @@ const create = async (req, res) => {
 const destroy = async (req, res) => {
     try {
         const username = req.params.username;
+
+        if (username === req.username) {
+            return res.status(HTTP_STATUS_CODE.CONFLICT).send({
+                status: "error",
+                message: "Không thể xoá tài khoản này",
+            });
+        }
+
         const user = await db.User.findOne({ where: { username: username } });
 
         if (!user) {
