@@ -25,21 +25,19 @@ export default function LoginPage() {
         loginAPI(username, password)
             .then((response) => {
                 const data = response.data.data;
-                const message = {
-                    title: `Đăng nhập thành công`,
-                    message: response.data.message,
-                    status: ToastStatus.SUCCESS,
-                };
-                handleAddMessage(message);
+                handleAddMessage(
+                    `Đăng nhập thành công`,
+                    response.data.message,
+                    ToastStatus.SUCCESS
+                );
                 login(username, data.access_token, data.refresh_token);
             })
             .catch(function (error) {
-                const message = {
-                    title: `Đăng nhập thất bại`,
-                    message: error.response.data.message,
-                    status: ToastStatus.DANGER,
-                };
-                handleAddMessage(message);
+                handleAddMessage(
+                    `Đăng nhập thất bại`,
+                    error.response.data.message,
+                    ToastStatus.DANGER
+                );
             });
     };
 

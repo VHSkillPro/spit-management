@@ -1,5 +1,7 @@
 import { Button } from "react-bootstrap";
 import { destroyUser } from "../../API/userService";
+import { ToastStatus } from "../../components/Toast";
+import { useMessage } from "../../contexts/MessageContext";
 
 export default function ListUserItem({
     id,
@@ -10,14 +12,25 @@ export default function ListUserItem({
     isChoose,
     onChoose,
 }) {
+    const { handleAddMessage } = useMessage();
+
     const handleDelete = () => {
         if (window.confirm("Bạn có chắc chắn xoá ?")) {
             destroyUser(username)
                 .then((response) => {
+                    handleAddMessage(
+                        "Thành công",
+                        "Xoá tài khoản thành công",
+                        ToastStatus.SUCCESS
+                    );
                     onChange();
                 })
                 .catch((error) => {
-                    alert(error);
+                    handleAddMessage(
+                        "Thất bại",
+                        error.response.data.message,
+                        ToastStatus.DANGER
+                    );
                 });
         }
     };

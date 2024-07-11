@@ -5,8 +5,15 @@ export const MessageContext = createContext();
 export default function MessageProvider({ children }) {
     const [messages, setMessages] = useState([]);
 
-    const handleAddMessage = (message) => {
-        const newMessages = [message, ...messages];
+    const handleAddMessage = (title, message, status) => {
+        const newMessages = [
+            {
+                title,
+                message,
+                status,
+            },
+            ...messages,
+        ];
         setMessages(newMessages);
     };
 

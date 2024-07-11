@@ -13,6 +13,8 @@ import {
 } from "react-bootstrap";
 import MyPagination from "../../components/MyPagination";
 import ListUserItem from "./ListUserItem";
+import { useMessage } from "../../contexts/MessageContext";
+import { ToastStatus } from "../../components/Toast";
 
 export default function ListUser() {
     // Số lượng user của mỗi trang
@@ -33,6 +35,8 @@ export default function ListUser() {
     // State `chooseUsers` lưu các users được chọn
     const [chooseUsers, setChooseUsers] = useState({});
 
+    const { handleAddMessage } = useMessage();
+
     // Xử lý việc lấy danh sách users từ API
     const handleGetUsers = () => {
         getAllUsers()
@@ -43,7 +47,11 @@ export default function ListUser() {
                 setIsLoading(false);
             })
             .catch((error) => {
-                alert(error);
+                handleAddMessage(
+                    "Lỗi",
+                    error.response.data.message,
+                    ToastStatus.DANGER
+                );
             });
     };
 

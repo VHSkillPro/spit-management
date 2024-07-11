@@ -6,7 +6,11 @@ export default function Message() {
     const { messages } = useMessage();
 
     return (
-        <ToastContainer position="top-end" className="m-3">
+        <ToastContainer
+            position="top-end"
+            className="m-3"
+            style={{ position: "fixed" }}
+        >
             {messages.map((data, index) => (
                 <MyToast
                     key={messages.length - index - 1}
