@@ -34,17 +34,17 @@ export default function ListUserItem({
                     ></input>
                 </div>
             </td>
-            <td>{id + 1}</td>
+            <td className="text-center">{id + 1}</td>
             <td>{username}</td>
             <td>{password}</td>
             <td>{role}</td>
             <td className="w-25">
                 <div className="d-flex justify-content-end">
                     <Button size="sm" className="me-2">
-                        Đổi mật khẩu
+                        Đổi chức vụ
                     </Button>
-                    <Button size="sm" className="me-2">
-                        Chức vụ
+                    <Button size="sm" className="me-2" title="Đổi mật khẩu">
+                        <i class="bi bi-key"></i>
                     </Button>
                     <Button
                         size="sm"

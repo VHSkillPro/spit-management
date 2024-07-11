@@ -71,6 +71,19 @@ export default function ListUser() {
         setChooseUsers(newChooseUsers);
     };
 
+    // Hàm xử lý chọn tất cả users
+    const handleToggleAllUsers = () => {
+        if (Object.keys(chooseUsers).length === users.length) {
+            setChooseUsers({});
+        } else {
+            const newChooseUsers = {};
+            for (const user of users) {
+                newChooseUsers[user.id] = true;
+            }
+            setChooseUsers(newChooseUsers);
+        }
+    };
+
     // Tạo ra giao diện của danh sách users
     const renderUsers = () => {
         const usersData = [];
@@ -107,15 +120,27 @@ export default function ListUser() {
                         <CardHeader className="d-flex align-items-center">
                             <CardTitle>Danh sách tài khoản</CardTitle>
                             <div className="ms-auto">
-                                {Object.keys(chooseUsers).length > 0 && (
-                                    <Button variant="danger me-2">
-                                        <i className="bi bi-trash3 me-2"></i>
-                                        Xoá tài khoản đã chọn
-                                    </Button>
-                                )}
                                 <Button title="Thêm tài khoản">
                                     <i className="bi bi-person-plus"></i>
                                 </Button>
+                                {Object.keys(chooseUsers).length > 0 && (
+                                    <>
+                                        <Button
+                                            variant="danger ms-2"
+                                            title="Xoá tài khoản đã chọn"
+                                        >
+                                            <i className="bi bi-trash3"></i>
+                                        </Button>
+                                        <Button
+                                            variant="danger ms-2"
+                                            title="Huỷ chọn"
+                                            onClick={() => setChooseUsers({})}
+                                        >
+                                            <i className="bi bi-x-lg me-2"></i>
+                                            Huỷ chọn
+                                        </Button>
+                                    </>
+                                )}
                             </div>
                         </CardHeader>
 
@@ -126,7 +151,23 @@ export default function ListUser() {
                                         <Table bordered hover striped>
                                             <thead>
                                                 <tr>
-                                                    <th></th>
+                                                    <th>
+                                                        <div className="d-flex justify-content-center">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="form-check-input"
+                                                                checked={
+                                                                    Object.keys(
+                                                                        chooseUsers
+                                                                    ).length ===
+                                                                    users.length
+                                                                }
+                                                                onClick={
+                                                                    handleToggleAllUsers
+                                                                }
+                                                            ></input>
+                                                        </div>
+                                                    </th>
                                                     <th>STT</th>
                                                     <th>Tên tài khoản</th>
                                                     <th>Mật khẩu</th>
