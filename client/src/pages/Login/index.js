@@ -1,6 +1,5 @@
 import { useState } from "react";
-import ToastContainer from "react-bootstrap/ToastContainer";
-import MyToast, { ToastStatus } from "../../components/Toast";
+import { ToastStatus } from "../../components/Toast";
 import { useAuth } from "../../contexts/AuthContext";
 import {
     Button,
@@ -13,18 +12,25 @@ import {
 } from "react-bootstrap";
 import InputGroupText from "react-bootstrap/esm/InputGroupText";
 import { loginAPI } from "../../API/authService";
+import { useMessage } from "../../contexts/MessageContext";
 
 export default function LoginPage() {
     const { login } = useAuth();
+    const { handleAddMessage } = useMessage();
 
     const [username, setUsername] = useState(null);
     const [password, setPassword] = useState(null);
-    const [messages, setMessages] = useState([]);
 
     const handleLogin = () => {
         loginAPI(username, password)
             .then((response) => {
                 const data = response.data.data;
+                const message = {
+                    title: `Đăng nhập thành công`,
+                    message: response.data.message,
+                    status: ToastStatus.SUCCESS,
+                };
+                handleAddMessage(message);
                 login(username, data.access_token, data.refresh_token);
             })
             .catch(function (error) {
@@ -33,9 +39,7 @@ export default function LoginPage() {
                     message: error.response.data.message,
                     status: ToastStatus.DANGER,
                 };
-
-                const newMessages = [message, ...messages];
-                setMessages(newMessages);
+                handleAddMessage(message);
             });
     };
 
@@ -119,18 +123,6 @@ export default function LoginPage() {
                         </CardBody>
                     </Card>
                 </div>
-
-                <ToastContainer position="top-end" className="m-3">
-                    {messages.map((data, index) => (
-                        <MyToast
-                            key={messages.length - index - 1}
-                            title={data.title}
-                            autoHide={true}
-                            message={data.message}
-                            status={data.status}
-                        ></MyToast>
-                    ))}
-                </ToastContainer>
             </div>
         </>
     );
