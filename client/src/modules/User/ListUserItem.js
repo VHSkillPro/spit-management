@@ -7,6 +7,8 @@ export default function ListUserItem({
     password,
     role,
     onChange,
+    isChoose,
+    onChoose,
 }) {
     const handleDelete = () => {
         if (window.confirm("Bạn có chắc chắn xoá ?")) {
@@ -22,6 +24,16 @@ export default function ListUserItem({
 
     return (
         <tr className={(id + 1) % 2 ? "odd" : "even"}>
+            <td>
+                <div className="d-flex justify-content-center">
+                    <input
+                        type="checkbox"
+                        className="form-check-input"
+                        checked={isChoose ? true : false}
+                        onClick={onChoose}
+                    ></input>
+                </div>
+            </td>
             <td>{id + 1}</td>
             <td>{username}</td>
             <td>{password}</td>
@@ -34,8 +46,13 @@ export default function ListUserItem({
                     <Button size="sm" className="me-2">
                         Chức vụ
                     </Button>
-                    <Button size="sm" variant="danger" onClick={handleDelete}>
-                        Xoá
+                    <Button
+                        size="sm"
+                        variant="danger"
+                        onClick={handleDelete}
+                        title="Xoá"
+                    >
+                        <i className="bi bi-trash3"></i>
                     </Button>
                 </div>
             </td>

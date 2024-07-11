@@ -15,14 +15,26 @@ import MyPagination from "../../components/MyPagination";
 import ListUserItem from "./ListUserItem";
 
 export default function ListUser() {
+    // Số lượng user của mỗi trang
     const pageSize = 10;
+
+    // Số lượng trang
     const noPages = useRef(0);
 
+    // State `isLoading` thể hiễn đã lấy được danh sách users chưa
     const [isLoading, setIsLoading] = useState(true);
+
+    // State `users` lưu danh sách users
     const [users, setUsers] = useState([]);
+
+    // State `page` thể hiện đang xem page nào
     const [page, setPage] = useState(1);
 
-    const displayUsers = () => {
+    // State `chooseUsers` lưu các users được chọn
+    const [chooseUsers, setChooseUsers] = useState({});
+
+    // Xử lý việc lấy danh sách users từ API
+    const handleGetUsers = () => {
         getAllUsers()
             .then((response) => {
                 const usersFromAPI = response.data.data.users;
@@ -35,18 +47,31 @@ export default function ListUser() {
             });
     };
 
+    // Cập nhật dữ liệu mỗi 5s một lần
     useEffect(() => {
         if (!isLoading) {
             const timeout = setTimeout(() => {
-                displayUsers();
+                handleGetUsers();
             }, 5000);
 
             return () => clearTimeout(timeout);
         } else {
-            displayUsers();
+            handleGetUsers();
         }
     });
 
+    // Hàm xử lý sự kiện chọn users
+    const handleToggleUserItem = (id) => {
+        const newChooseUsers = { ...chooseUsers };
+        if (!newChooseUsers[id]) {
+            newChooseUsers[id] = true;
+        } else {
+            delete newChooseUsers[id];
+        }
+        setChooseUsers(newChooseUsers);
+    };
+
+    // Tạo ra giao diện của danh sách users
     const renderUsers = () => {
         const usersData = [];
         for (
@@ -61,12 +86,15 @@ export default function ListUser() {
                     username={users[i].username}
                     password={users[i].password}
                     role={users[i].role}
-                    onChange={displayUsers}
+                    onChange={handleGetUsers}
+                    isChoose={chooseUsers[users[i].id]}
+                    onChoose={() => handleToggleUserItem(users[i].id)}
                 ></ListUserItem>
             );
         return usersData;
     };
 
+    // Nếu chưa có danh sách users
     if (isLoading) {
         return <div>Loading...</div>;
     }
@@ -78,10 +106,17 @@ export default function ListUser() {
                     <Card>
                         <CardHeader className="d-flex align-items-center">
                             <CardTitle>Danh sách tài khoản</CardTitle>
-                            <Button className="ms-auto">
-                                <i className="bi bi-person-plus me-2"></i>
-                                Thêm tài khoản
-                            </Button>
+                            <div className="ms-auto">
+                                {Object.keys(chooseUsers).length > 0 && (
+                                    <Button variant="danger me-2">
+                                        <i className="bi bi-trash3 me-2"></i>
+                                        Xoá tài khoản đã chọn
+                                    </Button>
+                                )}
+                                <Button title="Thêm tài khoản">
+                                    <i className="bi bi-person-plus"></i>
+                                </Button>
+                            </div>
                         </CardHeader>
 
                         <CardBody>
@@ -91,6 +126,7 @@ export default function ListUser() {
                                         <Table bordered hover striped>
                                             <thead>
                                                 <tr>
+                                                    <th></th>
                                                     <th>STT</th>
                                                     <th>Tên tài khoản</th>
                                                     <th>Mật khẩu</th>
@@ -101,6 +137,7 @@ export default function ListUser() {
                                             <tbody>{renderUsers()}</tbody>
                                             <tfoot>
                                                 <tr>
+                                                    <th></th>
                                                     <th>STT</th>
                                                     <th>Tên tài khoản</th>
                                                     <th>Mật khẩu</th>
