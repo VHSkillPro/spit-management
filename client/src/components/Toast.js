@@ -48,12 +48,12 @@ function MyToast({ title, message, status, autoHide }) {
             autohide={autoHide}
             bg={status}
         >
-            <Toast.Header className="border border-0">
+            <Toast.Header className="border border-0 py-1">
                 <div className="me-2">{renderSwitch(status)}</div>
                 <strong className="me-auto">{title}</strong>
-                <small>{age} seconds ago</small>
+                <small>{age}s ago</small>
             </Toast.Header>
-            <Toast.Body className="bg-body-tertiary rounded-bottom-2">
+            <Toast.Body className="bg-body-tertiary rounded-bottom-2 py-2">
                 {message}
             </Toast.Body>
         </Toast>
