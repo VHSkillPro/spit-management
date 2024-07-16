@@ -4,10 +4,10 @@ import SideBar from "../../modules/SideBar";
 import Footer from "../../modules/Footer";
 import AppMain from "../../modules/AppMain";
 import ListMember from "../../modules/Member/ListMember";
-import ListUser from "../../modules/User/ListUser";
+import User from "../../modules/User";
 
 export default function Home() {
-    const modules = [<ListMember></ListMember>, <ListUser></ListUser>];
+    const modules = [<ListMember></ListMember>, <User></User>];
 
     const [isCollapse, setIsCollapse] = useState(false);
     const sidebarClassName = useRef("sidebar-expand-lg");

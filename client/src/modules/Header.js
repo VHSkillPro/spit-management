@@ -1,17 +1,29 @@
 import { Button, Container } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext";
 import { logoutAPI } from "../API/authService";
+import { useMessage } from "../contexts/MessageContext";
+import { ToastStatus } from "../components/Toast";
 
 export default function Header({ toggleSideBar }) {
     const { user, logout } = useAuth();
+    const { handleAddMessage } = useMessage();
 
     const handleLogout = () => {
         logoutAPI()
-            .then(() => {
+            .then((response) => {
                 logout();
+                handleAddMessage(
+                    `Đăng xuất thành công`,
+                    response.data.message,
+                    ToastStatus.SUCCESS
+                );
             })
             .catch((error) => {
-                alert(error);
+                handleAddMessage(
+                    `Đăng xuất thất bại`,
+                    error.response.data.message,
+                    ToastStatus.DANGER
+                );
             });
     };
 

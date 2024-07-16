@@ -21,6 +21,10 @@ export default function LoginPage() {
     const [username, setUsername] = useState(null);
     const [password, setPassword] = useState(null);
 
+    const handleKeyDown = (event) => {
+        if (event.key === "Enter") handleLogin();
+    };
+
     const handleLogin = () => {
         loginAPI(username, password)
             .then((response) => {
@@ -87,6 +91,7 @@ export default function LoginPage() {
                                         onChange={(e) => {
                                             setPassword(e.target.value || null);
                                         }}
+                                        onKeyDown={handleKeyDown}
                                     ></FormControl>
                                     <InputGroupText>
                                         <span className="bi bi-lock-fill" />

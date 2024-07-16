@@ -1,22 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { getAllUsers } from "../../API/userService";
-import {
-    Button,
-    Card,
-    CardBody,
-    CardHeader,
-    CardTitle,
-    Col,
-    Container,
-    Row,
-    Table,
-} from "react-bootstrap";
+import { Col, Row, Table } from "react-bootstrap";
 import MyPagination from "../../components/MyPagination";
 import ListUserItem from "./ListUserItem";
 import { useMessage } from "../../contexts/MessageContext";
 import { ToastStatus } from "../../components/Toast";
 
-export default function ListUser() {
+export default function ListUser({ chooseUsers, setChooseUsers }) {
     // Số lượng user của mỗi trang
     const pageSize = 10;
 
@@ -31,9 +21,6 @@ export default function ListUser() {
 
     // State `page` thể hiện đang xem page nào
     const [page, setPage] = useState(1);
-
-    // State `chooseUsers` lưu các users được chọn
-    const [chooseUsers, setChooseUsers] = useState({});
 
     const { handleAddMessage } = useMessage();
 
@@ -124,122 +111,75 @@ export default function ListUser() {
     }
 
     return (
-        <Container fluid>
-            <div className="row">
-                <div className="col-12">
-                    <Card>
-                        <CardHeader className="d-flex align-items-center">
-                            <CardTitle>Danh sách tài khoản</CardTitle>
-                            <div className="ms-auto">
-                                <Button title="Thêm tài khoản">
-                                    <i className="bi bi-person-plus"></i>
-                                </Button>
-                                {Object.keys(chooseUsers).length > 0 && (
-                                    <>
-                                        <Button
-                                            variant="danger ms-2"
-                                            title="Xoá tài khoản đã chọn"
-                                        >
-                                            <i className="bi bi-trash3"></i>
-                                        </Button>
-                                        <Button
-                                            variant="danger ms-2"
-                                            title="Huỷ chọn"
-                                            onClick={() => setChooseUsers({})}
-                                        >
-                                            <i className="bi bi-x-lg me-2"></i>
-                                            Huỷ chọn
-                                        </Button>
-                                    </>
-                                )}
-                            </div>
-                        </CardHeader>
-
-                        <CardBody>
-                            <div className="dataTables_wrapper dt-bootstrap4">
-                                <Row>
-                                    <Col sm={12}>
-                                        <Table bordered hover striped>
-                                            <thead>
-                                                <tr>
-                                                    <th>
-                                                        <div className="d-flex justify-content-center">
-                                                            <input
-                                                                type="checkbox"
-                                                                className="form-check-input"
-                                                                checked={
-                                                                    Object.keys(
-                                                                        chooseUsers
-                                                                    ).length ===
-                                                                    users.length
-                                                                }
-                                                                onChange={
-                                                                    handleToggleAllUsers
-                                                                }
-                                                            ></input>
-                                                        </div>
-                                                    </th>
-                                                    <th>STT</th>
-                                                    <th>Tên tài khoản</th>
-                                                    <th>Mật khẩu</th>
-                                                    <th>Role</th>
-                                                    <th>Hành động</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>{renderUsers()}</tbody>
-                                            <tfoot>
-                                                <tr>
-                                                    <th>
-                                                        <div className="d-flex justify-content-center">
-                                                            <input
-                                                                type="checkbox"
-                                                                className="form-check-input"
-                                                                checked={
-                                                                    Object.keys(
-                                                                        chooseUsers
-                                                                    ).length ===
-                                                                    users.length
-                                                                }
-                                                                onChange={
-                                                                    handleToggleAllUsers
-                                                                }
-                                                            ></input>
-                                                        </div>
-                                                    </th>
-                                                    <th>STT</th>
-                                                    <th>Tên tài khoản</th>
-                                                    <th>Mật khẩu</th>
-                                                    <th>Role</th>
-                                                    <th>Hành động</th>
-                                                </tr>
-                                            </tfoot>
-                                        </Table>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col sm={12} md={5}>
-                                        <div className="dataTables_info">
-                                            {`Hiển thị ${
-                                                (page - 1) * pageSize + 1
-                                            } đến ${Math.min(
-                                                page * pageSize,
-                                                users.length
-                                            )} trong ${users.length} tài khoản`}
-                                        </div>
-                                    </Col>
-                                    <Col sm={12} md={7}>
-                                        <MyPagination
-                                            page={page}
-                                            onChangePage={setPage}
-                                            noPages={noPages.current}
-                                        ></MyPagination>
-                                    </Col>
-                                </Row>
-                            </div>
-                        </CardBody>
-                    </Card>
-                </div>
-            </div>
-        </Container>
+        <>
+            <Row>
+                <Col sm={12}>
+                    <Table bordered hover striped>
+                        <thead>
+                            <tr>
+                                <th>
+                                    <div className="d-flex justify-content-center">
+                                        <input
+                                            type="checkbox"
+                                            className="form-check-input"
+                                            checked={
+                                                Object.keys(chooseUsers)
+                                                    .length === users.length
+                                            }
+                                            onChange={handleToggleAllUsers}
+                                        ></input>
+                                    </div>
+                                </th>
+                                <th className="text-truncate">STT</th>
+                                <th className="text-truncate">Tên tài khoản</th>
+                                <th className="text-truncate">Mật khẩu</th>
+                                <th className="text-truncate">Role</th>
+                                <th className="text-truncate">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>{renderUsers()}</tbody>
+                        <tfoot>
+                            <tr>
+                                <th>
+                                    <div className="d-flex justify-content-center">
+                                        <input
+                                            type="checkbox"
+                                            className="form-check-input"
+                                            checked={
+                                                Object.keys(chooseUsers)
+                                                    .length === users.length
+                                            }
+                                            onChange={handleToggleAllUsers}
+                                        ></input>
+                                    </div>
+                                </th>
+                                <th className="text-truncate">STT</th>
+                                <th className="text-truncate">Tên tài khoản</th>
+                                <th className="text-truncate">Mật khẩu</th>
+                                <th className="text-truncate">Role</th>
+                                <th className="text-truncate">Hành động</th>
+                            </tr>
+                        </tfoot>
+                    </Table>
+                </Col>
+            </Row>
+            <Row>
+                <Col sm={12} md={5}>
+                    <div className="dataTables_info">
+                        {`Hiển thị ${(page - 1) * pageSize + 1} đến ${Math.min(
+                            page * pageSize,
+                            users.length
+                        )} trong ${users.length} tài khoản`}
+                    </div>
+                </Col>
+                <Col sm={12} md={7}>
+                    <MyPagination
+                        page={page}
+                        onChangePage={setPage}
+                        noPages={noPages.current}
+                    ></MyPagination>
+                </Col>
+            </Row>
+        </>
     );
 }

@@ -48,8 +48,12 @@ export default function ListUserItem({
                 </div>
             </td>
             <td>{id + 1}</td>
-            <td>{username}</td>
-            <td>{password}</td>
+            <td className="text-truncate" style={{ maxWidth: "100px" }}>
+                {username}
+            </td>
+            <td className="text-truncate" style={{ maxWidth: "200px" }}>
+                {password}
+            </td>
             <td>{role}</td>
             <td className="w-25">
                 <div className="d-flex justify-content-end">
