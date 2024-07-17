@@ -1,5 +1,6 @@
 "use strict";
 const { Model } = require("sequelize");
+
 module.exports = (sequelize, DataTypes) => {
     class User extends Model {
         /**
@@ -7,8 +8,14 @@ module.exports = (sequelize, DataTypes) => {
          * This method is not a part of Sequelize lifecycle.
          * The `models/index` file will call this method automatically.
          */
-        static associate(models) {}
+        static associate(models) {
+            User.belongsTo(models.Role, {
+                foreignKey: "roleId",
+                as: "role",
+            });
+        }
     }
+
     User.init(
         {
             username: {
@@ -21,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
                 unique: true,
             },
-            role: {
+            roleId: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
             },

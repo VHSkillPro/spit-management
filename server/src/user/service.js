@@ -16,7 +16,7 @@ const { validationResult } = require("express-validator");
 const index = async (req, res) => {
     try {
         // Lấy tất cả users
-        const users = await db.User.findAll();
+        const users = await db.User.findAll({ include: "role" });
 
         // Trả dữ liệu về cho client
         return res.status(HTTP_STATUS_CODE.OK).send({
