@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import {
     Button,
     Card,
@@ -31,13 +31,19 @@ export default function DisplayUser() {
     // State `users` lưu danh sách users
     const [users, setUsers] = useState([]);
 
+    // State `paramsSearch` lưu thông tin tìm kiếm
+    const paramsSearch = useRef({});
+
     // Xử lý việc lấy danh sách users từ API
-    const handleGetUsers = () => {
-        getAllUsers()
+    const handleGetUsers = (params) => {
+        getAllUsers(params)
             .then((response) => {
                 const usersFromAPI = response.data.data.users;
                 if (page > Math.ceil(usersFromAPI.length / pageSize)) {
                     setPage(Math.ceil(usersFromAPI.length / pageSize));
+                }
+                if (page < 1) {
+                    setPage(1);
                 }
                 setUsers(usersFromAPI);
                 setIsLoading(false);
@@ -47,15 +53,21 @@ export default function DisplayUser() {
             });
     };
 
+    // Xử lý tìm kiếm
+    const handleFind = (params) => {
+        paramsSearch.current = params;
+        handleGetUsers(params);
+    };
+
     // Cập nhật dữ liệu mỗi 5s một lần
     useEffect(() => {
         if (!isLoading) {
             const timeout = setTimeout(() => {
-                handleGetUsers();
+                handleGetUsers(paramsSearch.current);
             }, 5000);
             return () => clearTimeout(timeout);
         } else {
-            handleGetUsers();
+            handleGetUsers(paramsSearch.current);
         }
     });
 
@@ -103,7 +115,7 @@ export default function DisplayUser() {
                 <Row>
                     <Col xl={9}>{tableUser}</Col>
                     <Col xl={3}>
-                        <FormSearchUser />
+                        <FormSearchUser handleFind={handleFind} />
                     </Col>
                 </Row>
             );

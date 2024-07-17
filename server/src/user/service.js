@@ -2,6 +2,7 @@ const express = require("express");
 const db = require("../../models");
 const HTTP_STATUS_CODE = require("../../utils/httpStatusCode");
 const { validationResult } = require("express-validator");
+const { where, Op } = require("sequelize");
 
 /**
  * API trả về danh sách users
@@ -15,8 +16,22 @@ const { validationResult } = require("express-validator");
  */
 const index = async (req, res) => {
     try {
+        // Tiền xử lý query
+        if (req.query.username) {
+            req.query.username = {
+                [Op.like]: "%" + req.query.username + "%",
+            };
+        }
+
+        if (req.query.roleId) {
+            req.query.roleId = parseInt(req.query.roleId);
+        }
+
         // Lấy tất cả users
-        const users = await db.User.findAll({ include: "role" });
+        const users = await db.User.findAll({
+            include: "role",
+            where: req.query,
+        });
 
         // Trả dữ liệu về cho client
         return res.status(HTTP_STATUS_CODE.OK).send({

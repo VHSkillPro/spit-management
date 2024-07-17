@@ -1,20 +1,19 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+
 import { AuthProvider } from "./contexts/AuthContext";
-import { lazy } from "react";
 import AuthGuard from "./guards/AuthGuard";
+
 import MessageProvider from "./contexts/MessageContext";
 import Message from "./components/Message";
-// import ListMember from "./modules/Member/ListMember";
+
 import NotFound from "./pages/NotFound";
-// import Dashboard from "./modules/Dashboard";
 import BreadcrumbProvider from "./contexts/BreadcrumbContext";
-// import FormAddUser from "./modules/User/FormAddUser";
 
-const HomePage = lazy(() => import("./pages/HomePage"));
-const LoginPage = lazy(() => import("./pages/LoginPage"));
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
 
-const User = lazy(() => import("./modules/User"));
-const DisplayUser = lazy(() => import("./modules/User/DisplayUser"));
+import User from "./modules/User";
+import DisplayUser from "./modules/User/DisplayUser";
 
 export default function App() {
     return (

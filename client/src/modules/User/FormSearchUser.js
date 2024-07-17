@@ -11,8 +11,12 @@ import {
 } from "react-bootstrap";
 import { getAllRoles } from "../../API/roleService";
 
-export default function FormSearchUser() {
+export default function FormSearchUser({ handleFind }) {
     const [roles, setRoles] = useState([]);
+
+    // Dữ liệu của form tìm kiếm
+    const [paramUsername, setParamUsername] = useState("");
+    const [paramRole, setParamRole] = useState(0);
 
     // State `isLoading` thể hiễn đã lấy được danh sách roles chưa
     const [isLoading, setIsLoading] = useState(true);
@@ -29,11 +33,19 @@ export default function FormSearchUser() {
             });
     };
 
+    const handleSubmitForm = () => {
+        const params = {};
+        if (paramUsername.length > 0) params.username = paramUsername;
+        if (paramRole > 0) params.roleId = paramRole;
+        handleFind(params);
+    };
+
+    // Cập nhật dữ liệu mỗi 10s một lần
     useEffect(() => {
         if (!isLoading) {
             const timeout = setTimeout(() => {
                 handleGetRoles();
-            }, 5000);
+            }, 10000);
             return () => clearTimeout(timeout);
         } else {
             handleGetRoles();
@@ -52,13 +64,21 @@ export default function FormSearchUser() {
                         name="username"
                         type="text"
                         placeholder="Nhập tên tài khoản tìm kiếm"
+                        value={paramUsername}
+                        onChange={(e) => setParamUsername(e.target.value)}
                     ></FormControl>
                 </Form.Group>
 
                 <Form.Group className="mb-3">
                     <FormLabel className="fs-6">Role</FormLabel>
-                    <Form.Select name="role">
-                        <option key={0}>Chọn role cần tìm kiếm</option>
+                    <Form.Select
+                        name="role"
+                        value={paramRole}
+                        onChange={(e) => setParamRole(e.target.value)}
+                    >
+                        <option key={0} value={0}>
+                            Chọn role cần tìm kiếm
+                        </option>
                         {roles.map((role, idx) => (
                             <option key={idx} value={role.id}>
                                 {role.name}
@@ -68,7 +88,9 @@ export default function FormSearchUser() {
                 </Form.Group>
 
                 <Form.Group className="d-flex justify-content-center">
-                    <Button size="sm">Tìm kiếm</Button>
+                    <Button size="sm" onClick={handleSubmitForm}>
+                        Tìm kiếm
+                    </Button>
                 </Form.Group>
             </CardBody>
         </Card>

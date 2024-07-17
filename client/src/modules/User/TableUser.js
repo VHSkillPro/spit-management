@@ -1,4 +1,3 @@
-import { useState } from "react";
 import TableUserItem from "./TableUserItem";
 import { Col, Row, Table } from "react-bootstrap";
 import MyPagination from "../../components/MyPagination";
@@ -17,7 +16,7 @@ export default function TableUser({
     const renderUsers = () => {
         const usersData = [];
         for (
-            let i = (page - 1) * pageSize;
+            let i = Math.max(0, (page - 1) * pageSize);
             i < Math.min(page * pageSize, users.length);
             ++i
         )
@@ -90,7 +89,10 @@ export default function TableUser({
             <Row>
                 <Col sm={12} md={5}>
                     <div className="dataTables_info">
-                        {`Hiển thị ${(page - 1) * pageSize + 1} đến ${Math.min(
+                        {`Hiển thị ${Math.max(
+                            (page - 1) * pageSize + 1,
+                            0
+                        )} đến ${Math.min(
                             page * pageSize,
                             users.length
                         )} trong ${users.length} tài khoản`}
