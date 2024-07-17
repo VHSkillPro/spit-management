@@ -1,0 +1,102 @@
+openapi: 3.0.3
+info:
+    title: SPIT Management
+    description: |-
+        This is a sample Pet Store Server based on the OpenAPI 3.0 specification.  You can find out more about
+        Swagger at [https://swagger.io](https://swagger.io). In the third iteration of the pet store, we've switched to the design first approach!
+        You can now help us improve the API whether it's by making changes to the definition itself or to the code.
+        That way, with time, we can improve the API in general, and expose some of the new features in OAS3.
+
+        _If you're looking for the Swagger 2.0/OAS 2.0 version of Petstore, then click [here](https://editor.swagger.io/?url=https://petstore.swagger.io/v2/swagger.yaml). Alternatively, you can load via the `Edit > Load Petstore OAS 2.0` menu option!_
+
+        Some useful links:
+        - [The Pet Store repository](https://github.com/swagger-api/swagger-petstore)
+        - [The source API definition for the Pet Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)
+    termsOfService: http://swagger.io/terms/
+    contact:
+        email: nvhai090903@gmail.com
+    license:
+        name: Apache 2.0
+        url: http://www.apache.org/licenses/LICENSE-2.0.html
+    version: 1.0.11
+
+externalDocs:
+    description: Find out more about Swagger
+    url: http://swagger.io
+    
+servers:
+    - url: https://localhost:3000/api/v1
+
+tags:
+    - name: auth
+      description: Các thao tác về authenticated
+
+paths:
+    /auth/me:
+        get:
+            tags:
+              - auth
+            summary: Lấy thông tin của phiên đăng nhập hiện tại
+            description: Lấy thông tin của phiên đăng nhập hiện tại
+            responses:
+                "200":
+                    description: Lấy thông tin thành công
+
+    /auth/login:
+        post:
+            tags:
+                - auth
+            summary: Đăng nhập vào hệ thống
+            description: Sử dụng để đăng nhập vào hệ thống và trả về accessToken và resfreshToken
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                username:
+                                    type: string
+                                    example: admin
+                                password:
+                                    type: string
+                                    example: admin
+            responses:
+                "200":
+                    description: Đăng nhập thành công
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    access_token:
+                                        type: string
+                                        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzIxMjM2NDkwLCJleHAiOjE3MjEyMzcwOTB9.-8CJWfogS4m6cUepooYinyzsUuOBsm_NgGZIeZZoASU
+                                    refresh_token:
+                                        type: string
+                                        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzIxMjM2NDkwLCJleHAiOjE3MjEzMjI4OTB9.Vqdls-RFj2IAnjvuMnDWoUFKvPKl0haokK7WLOi1slE
+                "400":
+                    description: Tên đăng nhập hoặc mật khẩu trống
+                "401":
+                    description: Tên đăng nhập hoặc mật khẩu không chính xác
+                "500":
+                    description: Lỗi máy chủ
+
+components:
+    # schemas:
+        
+    # requestBodies:
+
+    securitySchemes:
+        petstore_auth:
+            type: oauth2
+            flows:
+                implicit:
+                    authorizationUrl: https://petstore3.swagger.io/oauth/authorize
+                    scopes:
+                        write:pets: modify pets in your account
+                        read:pets: read your pets
+        api_key:
+            type: apiKey
+            name: api_key
+            in: header
