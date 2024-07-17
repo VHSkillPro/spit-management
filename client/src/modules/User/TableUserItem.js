@@ -3,7 +3,7 @@ import { destroyUser } from "../../API/userService";
 import { ToastStatus } from "../../components/Toast";
 import { useMessage } from "../../contexts/MessageContext";
 
-export default function ListUserItem({
+export default function TableUserItem({
     id,
     username,
     password,
@@ -26,9 +26,11 @@ export default function ListUserItem({
                     onChange();
                 })
                 .catch((error) => {
+                    console.log(error);
+
                     handleAddMessage(
                         "Thất bại",
-                        error.response.data.message,
+                        "Xoá thất bại",
                         ToastStatus.DANGER
                     );
                 });
@@ -37,7 +39,7 @@ export default function ListUserItem({
 
     return (
         <tr className={(id + 1) % 2 ? "odd" : "even"}>
-            <td>
+            <td width={40}>
                 <div className="d-flex justify-content-center">
                     <input
                         type="checkbox"
@@ -47,15 +49,11 @@ export default function ListUserItem({
                     ></input>
                 </div>
             </td>
-            <td>{id + 1}</td>
-            <td className="text-truncate" style={{ maxWidth: "100px" }}>
-                {username}
-            </td>
-            <td className="text-truncate" style={{ maxWidth: "200px" }}>
-                {password}
-            </td>
+            <td width={50}>{id + 1}</td>
+            <td className="text-truncate">{username}</td>
+            <td className="text-truncate">{password}</td>
             <td>{role}</td>
-            <td className="w-25">
+            <td width={250}>
                 <div className="d-flex justify-content-end">
                     <Button size="sm" className="me-2">
                         Đổi chức vụ

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { ToastStatus } from "../../components/Toast";
-import { useAuth } from "../../contexts/AuthContext";
+import { ToastStatus } from "../components/Toast";
+import { useAuth } from "../contexts/AuthContext";
 import {
     Button,
     Card,
@@ -11,8 +11,8 @@ import {
     Row,
 } from "react-bootstrap";
 import InputGroupText from "react-bootstrap/esm/InputGroupText";
-import { loginAPI } from "../../API/authService";
-import { useMessage } from "../../contexts/MessageContext";
+import { loginAPI } from "../API/authService";
+import { useMessage } from "../contexts/MessageContext";
 
 export default function LoginPage() {
     const { login } = useAuth();

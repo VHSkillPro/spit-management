@@ -9,7 +9,7 @@ import {
     FormLabel,
 } from "react-bootstrap";
 
-export default function SearchUser() {
+export default function FormSearchUser() {
     return (
         <Card className="rounded-0 shadow-none">
             <CardHeader className="py-2">

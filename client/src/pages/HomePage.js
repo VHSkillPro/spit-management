@@ -1,17 +1,13 @@
 import { useRef, useState } from "react";
-import Header from "../../modules/Header";
-import SideBar from "../../modules/SideBar";
-import Footer from "../../modules/Footer";
-import AppMain from "../../modules/AppMain";
-import ListMember from "../../modules/Member/ListMember";
-import User from "../../modules/User";
+import Header from "../modules/Header";
+import SideBar from "../modules/SideBar";
+import Footer from "../modules/Footer";
+import { Outlet } from "react-router-dom";
+import AppMain from "../modules/AppMain";
 
-export default function Home() {
-    const modules = [<ListMember></ListMember>, <User></User>];
-
+export default function HomePage() {
     const [isCollapse, setIsCollapse] = useState(false);
     const sidebarClassName = useRef("sidebar-expand-lg");
-    const [whichActive, setWhichActive] = useState(0);
 
     const toggleSideBar = () => {
         sidebarClassName.current = !isCollapse
@@ -26,11 +22,10 @@ export default function Home() {
         >
             <div className="app-wrapper">
                 <Header toggleSideBar={toggleSideBar}></Header>
-                <SideBar
-                    whichActive={whichActive}
-                    setWhichActive={setWhichActive}
-                ></SideBar>
-                <AppMain child={modules[whichActive]}></AppMain>
+                <SideBar></SideBar>
+                <AppMain>
+                    <Outlet></Outlet>
+                </AppMain>
                 <Footer></Footer>
             </div>
         </div>

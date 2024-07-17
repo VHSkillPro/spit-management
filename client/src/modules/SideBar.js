@@ -1,6 +1,7 @@
 import { Nav } from "react-bootstrap";
+import { NavLink } from "react-router-dom";
 
-export default function SideBar({ whichActive, setWhichActive }) {
+export default function SideBar() {
     return (
         <aside
             className="app-sidebar bg-body-secondary shadow"
@@ -44,25 +45,30 @@ export default function SideBar({ whichActive, setWhichActive }) {
                     }}
                 >
                     <nav className="mt-2">
-                        <Nav
-                            className="sidebar-menu flex-column"
-                            as="ul"
-                            onSelect={(selectedKey) =>
-                                setWhichActive(selectedKey)
-                            }
-                            activeKey={whichActive}
-                        >
+                        <Nav className="sidebar-menu flex-column" as="ul">
                             <Nav.Item as="li">
-                                <Nav.Link eventKey={0}>
-                                    <i className="nav-icon bi bi-people"></i>
-                                    <p>Thành viên</p>
-                                </Nav.Link>
+                                <NavLink to="/" className="nav-link">
+                                    <i className="nav-icon bi bi-house"></i>
+                                    <p>Trang chủ</p>
+                                </NavLink>
                             </Nav.Item>
                             <Nav.Item as="li">
-                                <Nav.Link eventKey={1}>
+                                <NavLink to="/member" className="nav-link">
+                                    <i className="nav-icon bi bi-people"></i>
+                                    <p>Thành viên</p>
+                                </NavLink>
+                            </Nav.Item>
+                            <Nav.Item as="li">
+                                <NavLink to="/board" className="nav-link">
+                                    <i className="nav-icon bi bi-buildings"></i>
+                                    <p>Ban</p>
+                                </NavLink>
+                            </Nav.Item>
+                            <Nav.Item as="li">
+                                <NavLink to="/user" className="nav-link">
                                     <i className="nav-icon bi bi-person"></i>
                                     <p>Tài khoản</p>
-                                </Nav.Link>
+                                </NavLink>
                             </Nav.Item>
                         </Nav>
                     </nav>
