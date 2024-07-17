@@ -27,7 +27,7 @@ export default function TableUser({
                     id={i}
                     username={users[i].username}
                     password={users[i].password}
-                    role={users[i].role}
+                    role={users[i].role.name}
                     onChange={handleGetUsers}
                     isChoose={chooseUsers[users[i].id]}
                     onChoose={() => handleToggleUserItem(users[i].id)}
