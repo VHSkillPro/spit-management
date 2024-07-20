@@ -94,6 +94,7 @@ const me = async (req, res) => {
             status: "success",
             data: {
                 username: req.username,
+                roleId: req.roleId,
             },
             message: "Get user successfully",
         });

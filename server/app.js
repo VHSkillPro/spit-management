@@ -22,6 +22,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Register router - begin
 const { isAuthenticated } = require("./src/auth/middleware");
+const { test } = require("./test");
 
 const authRouter = require("./src/auth/route");
 const userRouter = require("./src/user/route");
@@ -30,6 +31,7 @@ const roleRouter = require("./src/role/route");
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", isAuthenticated, userRouter);
 app.use("/api/v1/roles", isAuthenticated, roleRouter);
+app.use("/test", test);
 // Register router - end
 
 module.exports = app;

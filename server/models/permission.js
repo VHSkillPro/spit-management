@@ -10,8 +10,13 @@ module.exports = (sequelize, DataTypes) => {
          */
         static associate(models) {
             // define association here
+            Permission.belongsToMany(models.Role, {
+                through: "Roles_Permissions",
+                as: "roles",
+            });
         }
     }
+
     Permission.init(
         {
             name: {
