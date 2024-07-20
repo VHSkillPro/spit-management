@@ -1,17 +1,23 @@
 "use strict";
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await queryInterface.createTable("Roles", {
+        await queryInterface.createTable("Permissions", {
             id: {
                 allowNull: false,
                 autoIncrement: true,
                 primaryKey: true,
                 type: Sequelize.INTEGER,
             },
-            name: {
-                allowNull: false,
+            route: {
                 type: Sequelize.STRING,
+                unique: true,
+                allowNull: false,
+            },
+            name: {
+                type: Sequelize.STRING,
+                allowNull: false,
             },
             createdAt: {
                 allowNull: false,
@@ -24,6 +30,6 @@ module.exports = {
         });
     },
     async down(queryInterface, Sequelize) {
-        await queryInterface.dropTable("Roles");
+        await queryInterface.dropTable("Permissions");
     },
 };
