@@ -4,7 +4,7 @@ const { index, create, destroy, update } = require("./service");
 const {
     validateQueryUserIndex,
     validateRegister,
-    validateChangePassword,
+    validateUpdateUser,
 } = require("./validate");
 const { checkPermission } = require("../auth/middleware");
 
@@ -13,7 +13,7 @@ router.post("/", checkPermission("user.create"), validateRegister, create);
 router.patch(
     "/:username",
     checkPermission("user.update"),
-    validateChangePassword,
+    validateUpdateUser,
     update
 );
 router.delete("/:username", checkPermission("user.destroy"), destroy);

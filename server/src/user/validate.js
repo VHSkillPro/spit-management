@@ -16,19 +16,12 @@ const validateRegister = [
         }),
 ];
 
-const validateChangePassword = [
+const validateUpdateUser = [
     body("password")
-        .notEmpty()
+        .optional()
         .isLength({ min: 6, max: 20 })
         .matches(/^[a-zA-Z0-9@.#$!%*?&^]+$/),
-    body("repassword")
-        .notEmpty()
-        .custom((value, { req }) => {
-            if (value !== req.body.password) {
-                throw new Error();
-            }
-            return true;
-        }),
+    body("roleId").optional().isNumeric().toInt(),
 ];
 
 const validateQueryUserIndex = [
@@ -41,5 +34,5 @@ const validateQueryUserIndex = [
 module.exports = {
     validateRegister,
     validateQueryUserIndex,
-    validateChangePassword,
+    validateUpdateUser,
 };

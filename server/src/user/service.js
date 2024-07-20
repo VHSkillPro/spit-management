@@ -136,7 +136,7 @@ const create = async (req, res) => {
 };
 
 /**
- * API cập nhật mật khẩu của user
+ * API cập nhật thông tin (mật khẩu, chức vụ) của user
  *
  * @path /api/v1/users/:username
  * @method PATCH
@@ -155,10 +155,8 @@ const update = async (req, res) => {
             });
         }
 
-        const username = req.params.username;
-        const password = req.body.password;
-
         // Lấy user cần đổi mật khẩu
+        const username = req.params.username;
         const user = await db.User.findOne({ where: { username: username } });
 
         // User không tồn tại
@@ -169,12 +167,31 @@ const update = async (req, res) => {
             });
         }
 
-        // Mã hoá mật khẩu
-        const saltRounds = 10;
-        const hashPassword = bcrypt.hashSync(password, saltRounds);
+        // Nếu có mật khẩu mới
+        if (req.body.password) {
+            // Mã hoá mật khẩu
+            const saltRounds = 10;
+            const hashPassword = bcrypt.hashSync(req.body.password, saltRounds);
 
-        // Đổi mật khẩu
-        user.password = hashPassword;
+            // Đổi mật khẩu
+            user.password = hashPassword;
+        }
+
+        // Nếu có roleId mới
+        if (req.body.roleId) {
+            const role = db.Role.findOne({
+                where: { id: req.body.roleId },
+            });
+
+            if (!role) {
+                return res.status(HTTP_STATUS_CODE.BAD_REQUEST).send({
+                    status: "error",
+                    message: "Request không hợp lệ",
+                });
+            }
+
+            user.roleId = req.body.roleId;
+        }
 
         // Cập nhật vào database
         await db.sequelize.transaction(async (t) => {
