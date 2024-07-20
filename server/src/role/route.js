@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const service = require("./service");
-const middleware = require("../auth/middleware");
+const { checkPermission } = require("../auth/middleware");
 
-router.get("/", middleware.isAuthenticated, service.index);
+router.get("/", checkPermission("role.index"), service.index);
 
 module.exports = router;

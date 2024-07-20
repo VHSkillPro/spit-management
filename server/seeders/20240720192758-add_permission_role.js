@@ -12,29 +12,28 @@ module.exports = {
          *   isBetaMember: false
          * }], {});
          */
-
         await queryInterface.bulkInsert("Permissions", [
             {
-                route: "user.index",
-                name: "Xem danh sách tài khoản",
+                route: "role.index",
+                name: "Xem danh sách chức vụ trong hệ thống",
                 createdAt: new Date(),
                 updatedAt: new Date(),
             },
             {
-                route: "user.create",
-                name: "Thêm tài khoản mới",
+                route: "role.create",
+                name: "Thêm chức vụ mới trong hệ thống",
                 createdAt: new Date(),
                 updatedAt: new Date(),
             },
             {
-                route: "user.update",
-                name: "Cập nhật thông tin tài khoản",
+                route: "role.update",
+                name: "Cập nhật thông tin chức vụ trong hệ thống",
                 createdAt: new Date(),
                 updatedAt: new Date(),
             },
             {
-                route: "user.destroy",
-                name: "Xoá tài khoản",
+                route: "role.destroy",
+                name: "Xoá chức vụ trong hệ thống",
                 createdAt: new Date(),
                 updatedAt: new Date(),
             },
@@ -48,8 +47,5 @@ module.exports = {
          * Example:
          * await queryInterface.bulkDelete('People', null, {});
          */
-        await queryInterface.bulkDelete("Permissions", {
-            route: ["user.index", "user.create", "user.update", "user.destroy"],
-        });
     },
 };
