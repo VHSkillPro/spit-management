@@ -39,17 +39,20 @@ export default function DisplayUser() {
         getAllUsers(params)
             .then((response) => {
                 const usersFromAPI = response.data.data.users;
+
                 if (page > Math.ceil(usersFromAPI.length / pageSize)) {
                     setPage(Math.ceil(usersFromAPI.length / pageSize));
                 }
+
                 if (page < 1) {
                     setPage(1);
                 }
+
                 setUsers(usersFromAPI);
                 setIsLoading(false);
             })
             .catch((error) => {
-                console.log(error);
+                console.log("handleGetUsers", error);
             });
     };
 

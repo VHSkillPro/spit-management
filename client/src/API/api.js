@@ -1,6 +1,7 @@
 import axios from "axios";
 import Cookies from "universal-cookie";
 import { refreshTokensAPI } from "./authService";
+import { logoutRef } from "../navigate";
 
 const cookies = new Cookies();
 
@@ -38,38 +39,45 @@ api.interceptors.response.use(
     async (error) => {
         const originRequest = error.config;
 
-        if (error.response.status === 401 && !isRefreshTokens) {
-            isRefreshTokens = true;
-            const refreshToken = cookies.get("refresh_token");
+        // Nếu request không phải là refresh_tokens
+        if (!isRefreshTokens) {
+            // Xác thực thất bại
+            if (error.response.status === 401) {
+                isRefreshTokens = true;
+                const refreshToken = cookies.get("refresh_token");
 
-            if (refreshToken) {
-                const response = await refreshTokensAPI();
+                // Nếu có refreshToken
+                if (refreshToken) {
+                    try {
+                        const response = await refreshTokensAPI();
+                        const newAccessToken = response.data.data.access_token;
+                        const newRefreshToken =
+                            response.data.data.refresh_token;
 
-                if (response) {
-                    cookies.set(
-                        "access_token",
-                        response.data.data.access_token,
-                        {
+                        cookies.set("access_token", newAccessToken, {
                             sameSite: true,
                             secure: true,
-                        }
-                    );
+                        });
 
-                    cookies.set(
-                        "refresh_token",
-                        response.data.data.refresh_token,
-                        {
+                        cookies.set("refresh_token", newRefreshToken, {
                             sameSite: true,
                             secure: true,
-                        }
-                    );
+                        });
 
+                        isRefreshTokens = false;
+                        return api(originRequest);
+                    } catch (error) {
+                        isRefreshTokens = false;
+                        return logoutRef.current();
+                    }
+                } else {
                     isRefreshTokens = false;
-                    return api(originRequest);
+                    return logoutRef.current();
                 }
             }
-
+        } else if (error.response.status === 401) {
             isRefreshTokens = false;
+            return logoutRef.current();
         }
 
         return Promise.reject(error);
