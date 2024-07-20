@@ -34,6 +34,7 @@ const isAuthenticated = async (req, res, next) => {
 
         // Đính thông tin về người dùng trong request
         req.username = verified.username;
+        req.roleId = verified.roleId;
 
         // Đưa request tới tác vụ tiếp theo
         return next();

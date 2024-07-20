@@ -8,10 +8,8 @@ const HTTP_STATUS_CODE = require("../../utils/httpStatusCode");
 /**
  * API đăng nhập
  *
- * URI: /api/v1/auth/login
- *
- * Method: POST
- *
+ * @path /api/v1/auth/login
+ * @method POST
  * @param {express.Request} req
  * @param {express.Response} res
  */
@@ -42,6 +40,7 @@ const login = async (req, res) => {
         // Tạo ra accessToken và refreshToken
         const payload = {
             username: user.username,
+            roleId: user.roleId,
         };
 
         const accessToken = generateAT(payload);
@@ -156,6 +155,7 @@ const refreshTokens = async (req, res) => {
         // Tạo lại accessToken và refreshToken
         const payload = {
             username: user.username,
+            roleId: user.roleId,
         };
 
         const newAccessToken = generateAT(payload);
