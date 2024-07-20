@@ -1,16 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const service = require("./service");
-const validate = require("./validate");
-const middleware = require("../auth/middleware");
+const { index, create, destroy } = require("./service");
 
-router.get("/", middleware.isAuthenticated, service.index);
-router.post(
-    "/",
-    middleware.isAuthenticated,
-    validate.validateRegister,
-    service.create
-);
-router.delete("/:username", middleware.isAuthenticated, service.destroy);
+const { isAuthenticated } = require("../auth/middleware");
+const { validateQueryUserIndex } = require("./validate");
+
+router.get("/", isAuthenticated, validateQueryUserIndex, index);
+// router.post("/", isAuthenticated, validate.validateRegister, create);
+router.delete("/:username", isAuthenticated, destroy);
 
 module.exports = router;

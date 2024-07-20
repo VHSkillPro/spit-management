@@ -2,36 +2,58 @@ const express = require("express");
 const db = require("../../models");
 const HTTP_STATUS_CODE = require("../../utils/httpStatusCode");
 const { validationResult } = require("express-validator");
-const { where, Op } = require("sequelize");
+const { Op } = require("sequelize");
 
 /**
  * API trả về danh sách users
  *
- * URI: /api/v1/users
- *
- * Method: GET
- *
+ * @path /api/v1/users
+ * @query
+ * - username: string (Optional)
+ * - roleId: int (Optional)
+ * - offset: int (Optional)
+ * - limit: int (Optional)
+ * @method GET
  * @param {express.Request} req
  * @param {express.Response} res
  */
 const index = async (req, res) => {
     try {
-        // Tiền xử lý query
+        // Xử lý query
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(HTTP_STATUS_CODE.BAD_REQUEST).send({
+                status: "error",
+                message: "Request không hợp lệ",
+            });
+        }
+
+        // Lấy tất cả users
+        const options = {
+            include: "role",
+            where: {},
+        };
+
         if (req.query.username) {
-            req.query.username = {
+            options.where.username = {
                 [Op.like]: "%" + req.query.username + "%",
             };
         }
 
         if (req.query.roleId) {
-            req.query.roleId = parseInt(req.query.roleId);
+            options.where.roleId = req.query.roleId;
         }
 
-        // Lấy tất cả users
-        const users = await db.User.findAll({
-            include: "role",
-            where: req.query,
-        });
+        if (req.query.limit) {
+            options.limit = req.query.limit;
+        }
+
+        if (req.query.offset) {
+            options.offset = req.query.offset;
+        }
+
+        const users = await db.User.findAll(options);
 
         // Trả dữ liệu về cho client
         return res.status(HTTP_STATUS_CODE.OK).send({

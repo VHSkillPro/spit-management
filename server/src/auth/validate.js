@@ -1,17 +1,15 @@
-const { check } = require("express-validator");
+const { body } = require("express-validator");
 
 /**
  * Validate login input fields.
  *
  * @returns {Array} An array of validation checks for username and password fields.
  */
-const validateLogin = () => {
-    return [
-        check("username").notEmpty().withMessage("Username is required."),
-        check("password").notEmpty().withMessage("Password is required."),
-    ];
-};
+const validateLogin = [
+    body("username").notEmpty(),
+    body("password").notEmpty(),
+];
 
 module.exports = {
-    validateLogin: validateLogin(),
+    validateLogin,
 };
