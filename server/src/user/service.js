@@ -1,5 +1,6 @@
 const express = require("express");
 const db = require("../../models");
+const bcrypt = require("bcrypt");
 const HTTP_STATUS_CODE = require("../../utils/httpStatusCode");
 const { validationResult } = require("express-validator");
 const { Op } = require("sequelize");
@@ -73,9 +74,18 @@ const index = async (req, res) => {
     }
 };
 
+/**
+ *  API thêm một user mới vào hệ thông
+ *
+ * @path /api/v1/users
+ * @method POST
+ * @param {express.Request} req
+ * @param {express.Response} res
+ * @returns
+ */
 const create = async (req, res) => {
     try {
-        // Handle form errors
+        // Xử lý lỗi dữ liệu đầu vào
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
@@ -85,7 +95,7 @@ const create = async (req, res) => {
             });
         }
 
-        // Check username is exist
+        // Kiểm tra username đã tồn tại
         const { username, password } = req.body;
         const user = await db.User.findOne({ where: { username: username } });
 
@@ -96,19 +106,21 @@ const create = async (req, res) => {
             });
         }
 
-        // Register successfully
+        // Mã hoá mật khẩu
         const saltRounds = 10;
         const hashPassword = bcrypt.hashSync(password, saltRounds);
 
-        // Insert user to database
-        await db.User.create({
-            username: username,
-            password: hashPassword,
-            role: 0,
-            refreshToken: null,
+        // Thêm user mới vào database
+        await db.sequelize.transaction(async (t) => {
+            await db.User.create({
+                username: username,
+                password: hashPassword,
+                roleId: 1,
+                refreshToken: null,
+            });
         });
 
-        // Return response
+        // Đăng ký thành công, trả về thông báo
         return res.status(HTTP_STATUS_CODE.CREATED).send({
             status: "success",
             message: "Đăng ký tài khoản thành công",
@@ -124,12 +136,71 @@ const create = async (req, res) => {
 };
 
 /**
+ * API cập nhật mật khẩu của user
+ *
+ * @path /api/v1/users/:username
+ * @method PATCH
+ * @param {express.Request} req
+ * @param {express.Response} res
+ */
+const update = async (req, res) => {
+    try {
+        // Xử lý lỗi dữ liệu đầu vào
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(HTTP_STATUS_CODE.BAD_REQUEST).send({
+                status: "error",
+                message: "Request không hợp lệ",
+            });
+        }
+
+        const username = req.params.username;
+        const password = req.body.password;
+
+        // Lấy user cần đổi mật khẩu
+        const user = await db.User.findOne({ where: { username: username } });
+
+        // User không tồn tại
+        if (!user) {
+            return res.status(HTTP_STATUS_CODE.NOT_FOUND).send({
+                status: "error",
+                message: "Không tìm thấy tài nguyên",
+            });
+        }
+
+        // Mã hoá mật khẩu
+        const saltRounds = 10;
+        const hashPassword = bcrypt.hashSync(password, saltRounds);
+
+        // Đổi mật khẩu
+        user.password = hashPassword;
+
+        // Cập nhật vào database
+        await db.sequelize.transaction(async (t) => {
+            await user.save();
+        });
+
+        // Trả về thông báo xoá thành công
+        return res.status(HTTP_STATUS_CODE.OK).send({
+            status: "success",
+            message: "Cập nhật thông tin thành công",
+        });
+    } catch (error) {
+        console.log(error);
+
+        return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send({
+            status: "error",
+            message: "Lỗi máy chủ",
+        });
+    }
+};
+
+/**
  * API xoá một user được chỉ định
  *
- * URI: /api/v1/users/:username
- *
- * Method: DELETE
- *
+ * @path /api/v1/users/:username
+ * @method DELETE
  * @param {express.Request} req
  * @param {express.Response} res
  */
@@ -146,25 +217,25 @@ const destroy = async (req, res) => {
             });
         }
 
-        // Kiểm tra tài khoản cần xoá có tồn tại ?
-        const user = await db.User.findOne({ where: { username: username } });
-
-        if (!user) {
-            return res.status(HTTP_STATUS_CODE.NOT_FOUND).send({
-                status: "error",
-                message: "Không tìm thấy tài nguyên",
-            });
-        }
-
-        // Xoá user trong database
         await db.sequelize.transaction(async (t) => {
-            await db.User.destroy({ where: { username: username } });
-        });
+            // Xoá user trong database
+            const user = await db.User.destroy({
+                where: { username: username },
+            });
 
-        // Trả về thông báo xoá thành công
-        return res.status(HTTP_STATUS_CODE.NO_CONTENT).send({
-            status: "success",
-            message: "Xoá tài khoản thành công",
+            // User không tồn tại
+            if (!user) {
+                return res.status(HTTP_STATUS_CODE.NOT_FOUND).send({
+                    status: "error",
+                    message: "Không tìm thấy tài nguyên",
+                });
+            }
+
+            // Trả về thông báo xoá thành công
+            return res.status(HTTP_STATUS_CODE.OK).send({
+                status: "success",
+                message: "Xoá tài khoản thành công",
+            });
         });
     } catch (error) {
         console.log(error);
@@ -179,5 +250,6 @@ const destroy = async (req, res) => {
 module.exports = {
     index,
     create,
+    update,
     destroy,
 };
