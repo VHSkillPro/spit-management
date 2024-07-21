@@ -2,7 +2,6 @@ const express = require("express");
 const db = require("../../models");
 const bcrypt = require("bcrypt");
 const { generateAT, generateRT, verifyRT } = require("../../utils/jwt");
-const { validationResult } = require("express-validator");
 const HTTP_STATUS_CODE = require("../../utils/httpStatusCode");
 
 /**
@@ -15,16 +14,6 @@ const HTTP_STATUS_CODE = require("../../utils/httpStatusCode");
  */
 const login = async (req, res) => {
     try {
-        // Kiểm tra tính đúng đắn của dữ liệu
-        const errors = validationResult(req);
-
-        if (!errors.isEmpty()) {
-            return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({
-                status: "error",
-                message: "Tên tài khoản và mật khẩu không được trống",
-            });
-        }
-
         // Lấy user từ database
         const { username, password } = req.body;
         let user = await db.User.findOne({ where: { username: username } });

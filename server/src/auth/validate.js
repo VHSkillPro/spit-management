@@ -1,4 +1,5 @@
 const { body } = require("express-validator");
+const { checkValidationResult } = require("../../middleware/validator");
 
 /**
  * Validate login input fields.
@@ -8,6 +9,7 @@ const { body } = require("express-validator");
 const validateLogin = [
     body("username").notEmpty(),
     body("password").notEmpty(),
+    checkValidationResult,
 ];
 
 module.exports = {

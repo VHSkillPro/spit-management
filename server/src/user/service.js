@@ -2,7 +2,6 @@ const express = require("express");
 const db = require("../../models");
 const bcrypt = require("bcrypt");
 const HTTP_STATUS_CODE = require("../../utils/httpStatusCode");
-const { validationResult } = require("express-validator");
 const { Op } = require("sequelize");
 
 /**
@@ -20,16 +19,6 @@ const { Op } = require("sequelize");
  */
 const index = async (req, res) => {
     try {
-        // Xử lý query
-        const errors = validationResult(req);
-
-        if (!errors.isEmpty()) {
-            return res.status(HTTP_STATUS_CODE.BAD_REQUEST).send({
-                status: "error",
-                message: "Request không hợp lệ",
-            });
-        }
-
         // Lấy tất cả users
         const options = {
             include: "role",
@@ -85,16 +74,6 @@ const index = async (req, res) => {
  */
 const create = async (req, res) => {
     try {
-        // Xử lý lỗi dữ liệu đầu vào
-        const errors = validationResult(req);
-
-        if (!errors.isEmpty()) {
-            return res.status(HTTP_STATUS_CODE.BAD_REQUEST).send({
-                status: "error",
-                message: "Request không hợp lệ",
-            });
-        }
-
         // Kiểm tra username đã tồn tại
         const { username, password } = req.body;
         const user = await db.User.findOne({ where: { username: username } });
@@ -145,16 +124,6 @@ const create = async (req, res) => {
  */
 const update = async (req, res) => {
     try {
-        // Xử lý lỗi dữ liệu đầu vào
-        const errors = validationResult(req);
-
-        if (!errors.isEmpty()) {
-            return res.status(HTTP_STATUS_CODE.BAD_REQUEST).send({
-                status: "error",
-                message: "Request không hợp lệ",
-            });
-        }
-
         // Lấy user cần đổi mật khẩu
         const username = req.params.username;
         const user = await db.User.findOne({ where: { username: username } });

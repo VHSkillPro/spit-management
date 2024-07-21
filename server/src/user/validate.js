@@ -1,4 +1,13 @@
 const { body, query } = require("express-validator");
+const { checkValidationResult } = require("../../middleware/validator");
+
+const validateQueryUserIndex = [
+    query("username").optional().notEmpty(),
+    query("roleId").optional().isNumeric().toInt(),
+    query("limit").optional().isNumeric().toInt(),
+    query("offset").optional().isNumeric().toInt(),
+    checkValidationResult,
+];
 
 const validateRegister = [
     body("username").notEmpty().isLength({ min: 5, max: 20 }).isAlphanumeric(),
@@ -14,6 +23,7 @@ const validateRegister = [
             }
             return true;
         }),
+    checkValidationResult,
 ];
 
 const validateUpdateUser = [
@@ -22,17 +32,11 @@ const validateUpdateUser = [
         .isLength({ min: 6, max: 20 })
         .matches(/^[a-zA-Z0-9@.#$!%*?&^]+$/),
     body("roleId").optional().isNumeric().toInt(),
-];
-
-const validateQueryUserIndex = [
-    query("username").optional().notEmpty(),
-    query("roleId").optional().isNumeric().toInt(),
-    query("limit").optional().isNumeric().toInt(),
-    query("offset").optional().isNumeric().toInt(),
+    checkValidationResult,
 ];
 
 module.exports = {
-    validateRegister,
     validateQueryUserIndex,
+    validateRegister,
     validateUpdateUser,
 };

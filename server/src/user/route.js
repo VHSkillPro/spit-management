@@ -1,21 +1,32 @@
 const express = require("express");
 const router = express.Router();
-const { index, create, destroy, update } = require("./service");
-const {
-    validateQueryUserIndex,
-    validateRegister,
-    validateUpdateUser,
-} = require("./validate");
+const service = require("./service");
+const validate = require("./validate");
 const { checkPermission } = require("../auth/middleware");
 
-router.get("/", checkPermission("user.index"), validateQueryUserIndex, index);
-router.post("/", checkPermission("user.create"), validateRegister, create);
+// ------ Define router ---------
+router.get(
+    "/",
+    checkPermission("user.index"),
+    validate.validateQueryUserIndex,
+    service.index
+);
+
+router.post(
+    "/",
+    checkPermission("user.create"),
+    validate.validateRegister,
+    service.create
+);
+
 router.patch(
     "/:username",
     checkPermission("user.update"),
-    validateUpdateUser,
-    update
+    validate.validateUpdateUser,
+    service.update
 );
-router.delete("/:username", checkPermission("user.destroy"), destroy);
+
+router.delete("/:username", checkPermission("user.destroy"), service.destroy);
+// ------------------------------
 
 module.exports = router;
