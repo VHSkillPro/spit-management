@@ -107,8 +107,64 @@ const update = async (req, res) => {
     }
 };
 
+/**
+ * API xóa role khỏi hệ thống
+ *
+ * @path /api/v1/roles/:roleId
+ * @method DELETE
+ * @param {express.Request} req
+ * @param {express.Response} res
+ */
+const destroy = async (req, res) => {
+    try {
+        // Lấy role cần xóa
+        const roleId = req.params.roleId;
+        const role = await db.Role.findOne({ where: { id: roleId } });
+
+        // Kiểm tra xem role có tồn tại không
+        if (!role) {
+            return res.status(HTTP_STATUS_CODE.NOT_FOUND).send({
+                status: "error",
+                message: "Không tìm thấy tài nguyên",
+            });
+        }
+
+        // Kiểm tra xem role có người dùng đang sử dụng không
+        const users = await db.User.findOne({
+            where: {
+                roleId: roleId,
+            },
+        });
+
+        if (users) {
+            return res.status(HTTP_STATUS_CODE.BAD_REQUEST).send({
+                status: "error",
+                message: "Không thể xóa role này vì có người dùng đang sử dụng",
+            });
+        }
+
+        // Xóa role và các dữ liệu liên quan khỏi database
+        await db.sequelize.transaction(async (t) => {
+            await role.destroy();
+        });
+
+        return res.status(HTTP_STATUS_CODE.OK).send({
+            status: "success",
+            message: "Xóa role thành công",
+        });
+    } catch (error) {
+        console.log(error);
+
+        return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send({
+            status: "error",
+            message: "Lỗi máy chủ",
+        });
+    }
+};
+
 module.exports = {
     index,
     create,
     update,
+    destroy,
 };

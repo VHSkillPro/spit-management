@@ -23,6 +23,15 @@ module.exports = (sequelize, DataTypes) => {
         {
             sequelize,
             modelName: "Role",
+            hooks: {
+                beforeDestroy: async (role, options) => {
+                    await sequelize.models.Roles_Permissions.destroy({
+                        where: {
+                            roleId: role.id,
+                        },
+                    });
+                },
+            },
         }
     );
 
