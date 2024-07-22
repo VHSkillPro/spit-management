@@ -18,23 +18,23 @@ function MyToast({ title, message, status, autoHide }) {
         }, 1000);
 
         return () => clearInterval(interval);
-    });
+    }, []);
 
     const renderSwitch = (status) => {
         switch (status) {
             case ToastStatus.SUCCESS:
-                return <i class="bi bi-check-circle text-success fs-4"></i>;
+                return <i className="bi bi-check-circle text-success fs-4"></i>;
 
             case ToastStatus.DANGER:
-                return <i class="bi bi-x-circle text-danger fs-4"></i>;
+                return <i className="bi bi-x-circle text-danger fs-4"></i>;
 
             case ToastStatus.WARNING:
                 return (
-                    <i class="bi bi-exclamation-circle text-warning fs-4"></i>
+                    <i className="bi bi-exclamation-circle text-warning fs-4"></i>
                 );
 
             case ToastStatus.INFO:
-                return <i class="bi bi-info-circle text-primary fs-4"></i>;
+                return <i className="bi bi-info-circle text-primary fs-4"></i>;
 
             default:
                 break;

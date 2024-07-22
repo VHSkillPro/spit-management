@@ -1,13 +1,7 @@
 import TableUserItem from "./TableUserItem";
 import { Table } from "react-bootstrap";
 
-export default function TableUser({
-    users,
-    chooseUsers,
-    handleToggleUserItem,
-    handleToggleAllUsers,
-    handleGetUsers,
-}) {
+export default function TableUser({ users, onChange }) {
     // Tạo ra giao diện của danh sách users
     const renderUsers = () => {
         return users.map((user) => {
@@ -18,9 +12,7 @@ export default function TableUser({
                     username={user.username}
                     password={user.password}
                     role={user.role.name}
-                    onChange={handleGetUsers}
-                    isChoose={chooseUsers[user.id]}
-                    onChoose={() => handleToggleUserItem(user.id)}
+                    onChange={onChange}
                 ></TableUserItem>
             );
         });
@@ -30,19 +22,6 @@ export default function TableUser({
         <Table bordered hover striped>
             <thead>
                 <tr>
-                    <th>
-                        <div className="d-flex justify-content-center">
-                            <input
-                                type="checkbox"
-                                className="form-check-input"
-                                checked={
-                                    Object.keys(chooseUsers).length ===
-                                    users.length
-                                }
-                                onChange={handleToggleAllUsers}
-                            ></input>
-                        </div>
-                    </th>
                     <th className="text-truncate">STT</th>
                     <th className="text-truncate">Tên tài khoản</th>
                     <th className="text-truncate">Mật khẩu</th>
@@ -53,19 +32,6 @@ export default function TableUser({
             <tbody>{renderUsers()}</tbody>
             <tfoot>
                 <tr>
-                    <th>
-                        <div className="d-flex justify-content-center">
-                            <input
-                                type="checkbox"
-                                className="form-check-input"
-                                checked={
-                                    Object.keys(chooseUsers).length ===
-                                    users.length
-                                }
-                                onChange={handleToggleAllUsers}
-                            ></input>
-                        </div>
-                    </th>
                     <th className="text-truncate">STT</th>
                     <th className="text-truncate">Tên tài khoản</th>
                     <th className="text-truncate">Mật khẩu</th>

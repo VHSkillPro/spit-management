@@ -11,7 +11,7 @@ import {
 } from "react-bootstrap";
 import { getAllRoles } from "../../API/roleService";
 
-export default function FormSearchUser({ handleFind }) {
+export default function FormSearchUser({ onFind }) {
     const [roles, setRoles] = useState([]);
 
     // Dữ liệu của form tìm kiếm
@@ -22,7 +22,7 @@ export default function FormSearchUser({ handleFind }) {
         const params = {};
         if (username.length > 0) params.username = username;
         if (roleId > 0) params.roleId = roleId;
-        handleFind(params);
+        onFind(params);
     };
 
     useEffect(() => {

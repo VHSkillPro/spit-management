@@ -29,9 +29,6 @@ export default function DisplayUser() {
     // State `displaySearch` lưu trạng thái ẩn/hiện của bảng tìm kiếm
     const [displaySearch, setDisplaySearch] = useState(false);
 
-    // State `chooseUsers` lưu các users được chọn
-    const [chooseUsers, setChooseUsers] = useState({});
-
     // State `isLoading` thể hiễn đã lấy được danh sách users chưa
     const [isLoading, setIsLoading] = useState(true);
 
@@ -39,7 +36,8 @@ export default function DisplayUser() {
     const [paramsSearch, setParamsSearch] = useState({});
 
     // Xử lý việc lấy danh sách users từ API
-    const handleGetUsers = (params) => {
+    const handleGetUsers = () => {
+        const params = paramsSearch;
         params.offset = (page - 1) * pageSize;
         params.limit = pageSize;
 
@@ -74,63 +72,28 @@ export default function DisplayUser() {
     // Xử lý tìm kiếm
     const handleFind = (params) => {
         setParamsSearch(params);
-        handleGetUsers(params);
+        handleGetUsers();
     };
 
     // Cập nhật dữ liệu mỗi 5s một lần
     useEffect(() => {
-        handleGetUsers(paramsSearch);
-        const timeout = setTimeout(() => {
-            handleGetUsers(paramsSearch);
+        handleGetUsers();
+        const interval = setInterval(() => {
+            handleGetUsers();
         }, 5000);
-        return () => clearTimeout(timeout);
+        return () => clearInterval(interval);
     }, [page, paramsSearch]);
-
-    // Hàm xử lý sự kiện chọn users
-    const handleToggleUserItem = (id) => {
-        const newChooseUsers = { ...chooseUsers };
-        if (!newChooseUsers[id]) {
-            newChooseUsers[id] = true;
-        } else {
-            delete newChooseUsers[id];
-        }
-        setChooseUsers(newChooseUsers);
-    };
-
-    // Hàm xử lý chọn tất cả users
-    const handleToggleAllUsers = () => {
-        if (Object.keys(chooseUsers).length === users.length) {
-            setChooseUsers({});
-        } else {
-            const newChooseUsers = {};
-            for (const user of users) {
-                newChooseUsers[user.id] = true;
-            }
-            setChooseUsers(newChooseUsers);
-        }
-    };
 
     // Hàm xử lý hiển thị nội dung
     const renderContent = () => {
-        const tableUser = (
-            <TableUser
-                users={users}
-                chooseUsers={chooseUsers}
-                handleToggleUserItem={handleToggleUserItem}
-                handleToggleAllUsers={handleToggleAllUsers}
-                handleGetUsers={handleGetUsers}
-                page={page}
-                pageSize={pageSize}
-                setPage={setPage}
-            />
-        );
+        const tableUser = <TableUser users={users} onChange={handleGetUsers} />;
 
         if (displaySearch) {
             return (
                 <Row>
                     <Col xl={9}>{tableUser}</Col>
                     <Col xl={3}>
-                        <FormSearchUser handleFind={handleFind} />
+                        <FormSearchUser onFind={handleFind} />
                     </Col>
                 </Row>
             );
@@ -165,28 +128,6 @@ export default function DisplayUser() {
                     >
                         <i className="bi bi-search"></i>
                     </Button>
-                    {Object.keys(chooseUsers).length > 0 && (
-                        <>
-                            <Button
-                                className="ms-2"
-                                variant="danger"
-                                title="Xoá tài khoản đã chọn"
-                                size="sm"
-                            >
-                                <i className="bi bi-trash3"></i>
-                            </Button>
-                            <Button
-                                className="ms-2"
-                                variant="danger"
-                                title="Huỷ chọn"
-                                size="sm"
-                                onClick={() => setChooseUsers({})}
-                            >
-                                <i className="bi bi-x-lg me-2"></i>
-                                Huỷ chọn
-                            </Button>
-                        </>
-                    )}
                 </div>
             </CardHeader>
             <CardBody>

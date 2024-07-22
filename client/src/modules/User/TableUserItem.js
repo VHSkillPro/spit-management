@@ -9,15 +9,13 @@ export default function TableUserItem({
     password,
     role,
     onChange,
-    isChoose,
-    onChoose,
 }) {
     const { handleAddMessage } = useMessage();
 
     const handleDelete = () => {
         if (window.confirm("Bạn có chắc chắn xoá ?")) {
             destroyUser(username)
-                .then((response) => {
+                .then(() => {
                     handleAddMessage(
                         "Thành công",
                         "Xoá tài khoản thành công",
@@ -25,9 +23,7 @@ export default function TableUserItem({
                     );
                     onChange();
                 })
-                .catch((error) => {
-                    console.log(error);
-
+                .catch(() => {
                     handleAddMessage(
                         "Thất bại",
                         "Xoá thất bại",
@@ -39,16 +35,6 @@ export default function TableUserItem({
 
     return (
         <tr className={(id + 1) % 2 ? "odd" : "even"}>
-            <td width={40}>
-                <div className="d-flex justify-content-center">
-                    <input
-                        type="checkbox"
-                        className="form-check-input"
-                        checked={isChoose ? true : false}
-                        onChange={onChoose}
-                    ></input>
-                </div>
-            </td>
             <td width={50}>{id + 1}</td>
             <td className="text-truncate">{username}</td>
             <td className="text-truncate">{password}</td>
