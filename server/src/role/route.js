@@ -42,4 +42,11 @@ router.patch(
  */
 router.delete("/:roleId", checkPermission("role.destroy"), service.destroy);
 
+/**
+ * API lấy danh sách quyền của role
+ * @path /api/v1/roles/:roleId
+ * @method GET
+ */
+router.get("/:roleId", service.permissions);
+
 module.exports = router;

@@ -3,8 +3,7 @@ const db = require("../../models");
 const HTTP_STATUS_CODE = require("../../utils/httpStatusCode");
 
 /**
- * API trả về danh sách role
- *
+ * API trả về danh sách roles
  * @path /api/v1/roles
  * @method GET
  * @param {express.Request} req
@@ -12,6 +11,7 @@ const HTTP_STATUS_CODE = require("../../utils/httpStatusCode");
  */
 const index = async (req, res) => {
     try {
+        // Lấy tất cả roles từ database
         const roles = await db.Role.findAll();
 
         return res.status(HTTP_STATUS_CODE.OK).send({
@@ -33,7 +33,6 @@ const index = async (req, res) => {
 
 /**
  * API thêm role mới và hệ thống
- *
  * @path /api/v1/roles
  * @method POST
  * @param {express.Request} req
@@ -162,9 +161,62 @@ const destroy = async (req, res) => {
     }
 };
 
+/**
+ * API lấy danh sách quyền của role
+ * @path /api/v1/roles/:roleId
+ * @method GET
+ * @param {express.Request} req
+ * @param {express.Response} res
+ */
+const permissions = async (req, res) => {
+    try {
+        // Lấy role từ database
+        const role = await db.Role.findOne({
+            where: {
+                id: req.params.roleId,
+            },
+            include: "permissions",
+        });
+
+        // Kiểm tra xem role có tồn tại không
+        if (!role) {
+            return res.status(HTTP_STATUS_CODE.NOT_FOUND).send({
+                status: "error",
+                message: "Không tìm thấy tài nguyên",
+            });
+        }
+
+        // Lấy danh sách quyền của role
+        const permissions = role.permissions.map((permission) => {
+            return {
+                id: permission.id,
+                name: permission.name,
+                route: permission.route,
+            };
+        });
+
+        // Trả về kết quả
+        return res.status(HTTP_STATUS_CODE.OK).send({
+            status: "success",
+            data: {
+                permissions: permissions,
+            },
+            message: "Lấy danh sách quyền của role thành công",
+        });
+    } catch (error) {
+        console.log(error);
+
+        return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send({
+            status: "error",
+            message: "Lỗi máy chủ",
+        });
+    }
+};
+
 module.exports = {
     index,
     create,
     update,
     destroy,
+    permissions,
 };
