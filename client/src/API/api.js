@@ -1,7 +1,7 @@
 import axios from "axios";
 import Cookies from "universal-cookie";
 import { refreshTokensAPI } from "./authService";
-import { logoutRef } from "../navigate";
+import { logoutRef } from "../global";
 
 const cookies = new Cookies();
 

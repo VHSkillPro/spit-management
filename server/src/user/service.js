@@ -5,8 +5,7 @@ const HTTP_STATUS_CODE = require("../../utils/httpStatusCode");
 const { Op } = require("sequelize");
 
 /**
- * API trả về danh sách users
- *
+ * API lấy tất cả users trong hệ thống
  * @path /api/v1/users
  * @query
  * - username: string (Optional)
@@ -19,7 +18,7 @@ const { Op } = require("sequelize");
  */
 const index = async (req, res) => {
     try {
-        // Lấy tất cả users
+        // Lấy tất cả users trong database
         const options = {
             include: "role",
             where: {},
@@ -50,6 +49,7 @@ const index = async (req, res) => {
             status: "success",
             data: {
                 users: users,
+                total: await db.User.count(),
             },
             message: "Lấy tất cả users thành công",
         });
@@ -65,12 +65,10 @@ const index = async (req, res) => {
 
 /**
  *  API thêm một user mới vào hệ thông
- *
  * @path /api/v1/users
  * @method POST
  * @param {express.Request} req
  * @param {express.Response} res
- * @returns
  */
 const create = async (req, res) => {
     try {
@@ -116,7 +114,6 @@ const create = async (req, res) => {
 
 /**
  * API cập nhật thông tin (mật khẩu, chức vụ) của user
- *
  * @path /api/v1/users/:username
  * @method PATCH
  * @param {express.Request} req

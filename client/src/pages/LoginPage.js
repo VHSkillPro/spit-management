@@ -13,6 +13,9 @@ import {
 import InputGroupText from "react-bootstrap/esm/InputGroupText";
 import { loginAPI } from "../API/authService";
 import { useMessage } from "../contexts/MessageContext";
+import Cookies from "universal-cookie";
+
+const cookies = new Cookies();
 
 export default function LoginPage() {
     const { login } = useAuth();
@@ -21,25 +24,42 @@ export default function LoginPage() {
     const [username, setUsername] = useState(null);
     const [password, setPassword] = useState(null);
 
+    // Handle enter key
     const handleKeyDown = (event) => {
         if (event.key === "Enter") handleLogin();
     };
 
+    // Handle login
     const handleLogin = () => {
         loginAPI(username, password)
             .then((response) => {
+                // Set cookies
                 const data = response.data.data;
+
+                cookies.set("access_token", data.access_token, {
+                    sameSite: true,
+                    secure: true,
+                });
+
+                cookies.set("refresh_token", data.refresh_token, {
+                    sameSite: true,
+                    secure: true,
+                });
+
+                // Đăng nhập
+                login();
+
+                // Show toast
                 handleAddMessage(
                     `Đăng nhập thành công`,
                     response.data.message,
                     ToastStatus.SUCCESS
                 );
-                login(username, data.access_token, data.refresh_token);
             })
             .catch(function (error) {
                 handleAddMessage(
                     `Đăng nhập thất bại`,
-                    error.response.data.message,
+                    "Tài khoản hoặc mật khẩu không chính xác",
                     ToastStatus.DANGER
                 );
             });

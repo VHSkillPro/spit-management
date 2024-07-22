@@ -1,7 +1,10 @@
 import { Nav } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
+import { usePermission } from "../contexts/PermissionContext";
 
 export default function SideBar() {
+    const { permissions } = usePermission();
+
     return (
         <aside
             className="app-sidebar bg-body-secondary shadow"
@@ -64,12 +67,14 @@ export default function SideBar() {
                                     <p>Ban</p>
                                 </NavLink>
                             </Nav.Item>
-                            <Nav.Item as="li">
-                                <NavLink to="/user" className="nav-link">
-                                    <i className="nav-icon bi bi-person"></i>
-                                    <p>Tài khoản</p>
-                                </NavLink>
-                            </Nav.Item>
+                            {permissions["user.index"] && (
+                                <Nav.Item as="li">
+                                    <NavLink to="/user" className="nav-link">
+                                        <i className="nav-icon bi bi-person"></i>
+                                        <p>Tài khoản</p>
+                                    </NavLink>
+                                </Nav.Item>
+                            )}
                         </Nav>
                     </nav>
                 </div>

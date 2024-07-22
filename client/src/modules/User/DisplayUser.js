@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
     Button,
     Card,
@@ -11,6 +11,7 @@ import {
 import { getAllUsers } from "../../API/userService";
 import TableUser from "./TableUser";
 import FormSearchUser from "./FormSearchUser";
+import MyPagination from "../../components/MyPagination";
 
 export default function DisplayUser() {
     // Số lượng user của mỗi trang
@@ -18,6 +19,12 @@ export default function DisplayUser() {
 
     // State `page` thể hiện đang xem page nào
     const [page, setPage] = useState(1);
+
+    // State `total` thể hiện tổng số lượng user trong database
+    const [total, setTotal] = useState(0);
+
+    // State `users` lưu danh sách users
+    const [users, setUsers] = useState([]);
 
     // State `displaySearch` lưu trạng thái ẩn/hiện của bảng tìm kiếm
     const [displaySearch, setDisplaySearch] = useState(false);
@@ -28,51 +35,56 @@ export default function DisplayUser() {
     // State `isLoading` thể hiễn đã lấy được danh sách users chưa
     const [isLoading, setIsLoading] = useState(true);
 
-    // State `users` lưu danh sách users
-    const [users, setUsers] = useState([]);
-
     // State `paramsSearch` lưu thông tin tìm kiếm
-    const paramsSearch = useRef({});
+    const [paramsSearch, setParamsSearch] = useState({});
 
     // Xử lý việc lấy danh sách users từ API
     const handleGetUsers = (params) => {
+        params.offset = (page - 1) * pageSize;
+        params.limit = pageSize;
+
         getAllUsers(params)
             .then((response) => {
                 const usersFromAPI = response.data.data.users;
+                const totalUsers = response.data.data.total;
 
-                if (page > Math.ceil(usersFromAPI.length / pageSize)) {
-                    setPage(Math.ceil(usersFromAPI.length / pageSize));
+                // Thêm index cho user
+                usersFromAPI.map((user, idx) => {
+                    user.idx = (page - 1) * pageSize + idx;
+                    return user;
+                });
+
+                // Nếu page hiện tại lớn hơn số trang tối đa
+                if (page > Math.ceil(totalUsers / pageSize)) {
+                    setPage(Math.ceil(totalUsers / pageSize));
                 }
 
+                // Nếu page hiện tại nhỏ hơn 1
                 if (page < 1) {
                     setPage(1);
                 }
 
+                setTotal(totalUsers);
                 setUsers(usersFromAPI);
                 setIsLoading(false);
             })
-            .catch((error) => {
-                console.log("handleGetUsers", error);
-            });
+            .catch(() => {});
     };
 
     // Xử lý tìm kiếm
     const handleFind = (params) => {
-        paramsSearch.current = params;
+        setParamsSearch(params);
         handleGetUsers(params);
     };
 
     // Cập nhật dữ liệu mỗi 5s một lần
     useEffect(() => {
-        if (!isLoading) {
-            const timeout = setTimeout(() => {
-                handleGetUsers(paramsSearch.current);
-            }, 5000);
-            return () => clearTimeout(timeout);
-        } else {
-            handleGetUsers(paramsSearch.current);
-        }
-    });
+        handleGetUsers(paramsSearch);
+        const timeout = setTimeout(() => {
+            handleGetUsers(paramsSearch);
+        }, 5000);
+        return () => clearTimeout(timeout);
+    }, [page, paramsSearch]);
 
     // Hàm xử lý sự kiện chọn users
     const handleToggleUserItem = (id) => {
@@ -177,7 +189,29 @@ export default function DisplayUser() {
                     )}
                 </div>
             </CardHeader>
-            <CardBody>{renderContent()}</CardBody>
+            <CardBody>
+                <Row>{renderContent()}</Row>
+                <Row>
+                    <Col sm={12} md={5}>
+                        <div className="dataTables_info">
+                            {`Hiển thị ${Math.max(
+                                (page - 1) * pageSize + 1,
+                                0
+                            )} đến ${Math.min(
+                                page * pageSize,
+                                total
+                            )} trong ${total} tài khoản`}
+                        </div>
+                    </Col>
+                    <Col sm={12} md={7}>
+                        <MyPagination
+                            page={page}
+                            onChangePage={setPage}
+                            noPages={Math.ceil(total / pageSize)}
+                        ></MyPagination>
+                    </Col>
+                </Row>
+            </CardBody>
         </Card>
     );
 }

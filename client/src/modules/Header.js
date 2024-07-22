@@ -3,6 +3,9 @@ import { useAuth } from "../contexts/AuthContext";
 import { logoutAPI } from "../API/authService";
 import { useMessage } from "../contexts/MessageContext";
 import { ToastStatus } from "../components/Toast";
+import Cookies from "universal-cookie";
+
+const cookies = new Cookies();
 
 export default function Header({ toggleSideBar }) {
     const { user, logout } = useAuth();
@@ -12,7 +15,14 @@ export default function Header({ toggleSideBar }) {
     const handleLogout = () => {
         logoutAPI()
             .then((response) => {
+                // Xóa cookies
+                cookies.remove("access_token");
+                cookies.remove("refresh_token");
+
+                // Đăng xuất
                 logout();
+
+                // Hiển thị thông báo
                 handleAddMessage(
                     `Đăng xuất thành công`,
                     response.data.message,
@@ -20,19 +30,14 @@ export default function Header({ toggleSideBar }) {
                 );
             })
             .catch((error) => {
-                if (error.response) {
-                    handleAddMessage(
-                        `Đăng xuất thất bại`,
-                        error.response.data.message,
-                        ToastStatus.DANGER
-                    );
-                } else {
-                    handleAddMessage(
-                        `Đăng xuất thất bại`,
-                        "Không thể kết nổi với máy chủ",
-                        ToastStatus.DANGER
-                    );
-                }
+                // Hiển thị thông báo
+                handleAddMessage(
+                    `Đăng xuất thất bại`,
+                    error.response
+                        ? error.response.data.message
+                        : "Không thể kết nổi với máy chủ",
+                    ToastStatus.DANGER
+                );
             });
     };
 
@@ -74,7 +79,7 @@ export default function Header({ toggleSideBar }) {
                                     alt="User Image"
                                 />
                                 <span className="d-none d-md-inline">
-                                    {user.current.username}
+                                    {user.username}
                                 </span>
                             </a>
                             <ul className="dropdown-menu dropdown-menu-lg dropdown-menu-end">
@@ -85,7 +90,7 @@ export default function Header({ toggleSideBar }) {
                                         alt="User Image"
                                     />
                                     <p>
-                                        {user.current.username}
+                                        {user.username}
                                         <small>Member since Nov. 2023</small>
                                     </p>
                                 </li>

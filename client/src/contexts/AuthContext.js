@@ -1,69 +1,57 @@
-import React, {
-    createContext,
-    useContext,
-    useEffect,
-    useRef,
-    useState,
-} from "react";
-import Cookies from "universal-cookie";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { meAPI } from "../API/authService";
+import { logoutRef } from "../global";
 
-const cookies = new Cookies();
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const user = useRef({ username: null });
+    const [user, setUser] = useState({});
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
+    // Kiểm tra xem user đã login trước đó chưa
     useEffect(() => {
-        if (!isLoading) {
-            return;
-        }
-
         meAPI()
             .then((response) => {
-                user.current = {
+                const user = {
                     username: response.data.data.username,
+                    roleId: response.data.data.roleId,
                 };
-
+                setUser(user);
                 setIsAuthenticated(true);
-                setIsLoading(false);
             })
-            .catch((error) => {
-                setIsLoading(false);
+            .catch(() => {
+                setIsAuthenticated(false);
+            })
+            .finally(() => setIsLoading(false));
+    }, []);
+
+    // Hàm xử lý đăng nhập
+    const login = () => {
+        meAPI()
+            .then((response) => {
+                const user = {
+                    username: response.data.data.username,
+                    roleId: response.data.data.roleId,
+                };
+                setUser(user);
+                setIsAuthenticated(true);
+            })
+            .catch(() => {
+                setIsAuthenticated(false);
             });
-    });
-
-    const login = (username, accessToken, refreshToken) => {
-        cookies.set("access_token", accessToken, {
-            sameSite: true,
-            secure: true,
-        });
-
-        cookies.set("refresh_token", refreshToken, {
-            sameSite: true,
-            secure: true,
-        });
-
-        user.current = {
-            username: username,
-        };
-
-        setIsAuthenticated(true);
     };
 
+    // Hàm xử lý đăng xuất
     const logout = () => {
-        cookies.remove("access_token");
-        cookies.remove("refresh_token");
-
-        user.current = {
-            username: null,
-        };
-
+        setUser({});
         setIsAuthenticated(false);
     };
 
+    // Lưu hàm đăng xuất để truy cập toàn cục
+    logoutRef.current = logout;
+
+    // Nếu còn đăng kiểm tra thì hiển thị "Loading..."
     if (isLoading) {
         return <div>Loading...</div>;
     }

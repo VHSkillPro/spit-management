@@ -15,42 +15,26 @@ export default function FormSearchUser({ handleFind }) {
     const [roles, setRoles] = useState([]);
 
     // Dữ liệu của form tìm kiếm
-    const [paramUsername, setParamUsername] = useState("");
-    const [paramRole, setParamRole] = useState(0);
+    const [username, setUsername] = useState("");
+    const [roleId, setRoleId] = useState(0);
 
-    // State `isLoading` thể hiễn đã lấy được danh sách roles chưa
-    const [isLoading, setIsLoading] = useState(true);
+    const handleSubmitForm = () => {
+        const params = {};
+        if (username.length > 0) params.username = username;
+        if (roleId > 0) params.roleId = roleId;
+        handleFind(params);
+    };
 
-    const handleGetRoles = () => {
+    useEffect(() => {
         getAllRoles()
             .then((response) => {
                 const rolesFromAPI = response.data.data.roles;
                 setRoles(rolesFromAPI);
-                setIsLoading(false);
             })
             .catch((error) => {
                 console.log(error);
             });
-    };
-
-    const handleSubmitForm = () => {
-        const params = {};
-        if (paramUsername.length > 0) params.username = paramUsername;
-        if (paramRole > 0) params.roleId = paramRole;
-        handleFind(params);
-    };
-
-    // Cập nhật dữ liệu mỗi 10s một lần
-    useEffect(() => {
-        if (!isLoading) {
-            const timeout = setTimeout(() => {
-                handleGetRoles();
-            }, 10000);
-            return () => clearTimeout(timeout);
-        } else {
-            handleGetRoles();
-        }
-    });
+    }, []);
 
     return (
         <Card className="rounded-0 shadow-none">
@@ -64,8 +48,8 @@ export default function FormSearchUser({ handleFind }) {
                         name="username"
                         type="text"
                         placeholder="Nhập tên tài khoản tìm kiếm"
-                        value={paramUsername}
-                        onChange={(e) => setParamUsername(e.target.value)}
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
                     ></FormControl>
                 </Form.Group>
 
@@ -73,8 +57,8 @@ export default function FormSearchUser({ handleFind }) {
                     <FormLabel className="fs-6">Role</FormLabel>
                     <Form.Select
                         name="role"
-                        value={paramRole}
-                        onChange={(e) => setParamRole(e.target.value)}
+                        value={roleId}
+                        onChange={(e) => setRoleId(e.target.value)}
                     >
                         <option key={0} value={0}>
                             Chọn role cần tìm kiếm
