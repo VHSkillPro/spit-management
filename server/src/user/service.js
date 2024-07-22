@@ -64,7 +64,47 @@ const index = async (req, res) => {
 };
 
 /**
- *  API thêm một user mới vào hệ thông
+ * API lấy thông tin user theo username
+ * @path /api/v1/users/:username
+ * @method GET
+ * @param {express.Request} req
+ * @param {express.Response} res
+ */
+const show = async (req, res) => {
+    try {
+        // Lấy thông tin user
+        const username = req.params.username;
+        const user = await db.User.findOne({
+            where: { username: username },
+            include: "role",
+        });
+
+        // User không tồn tại
+        if (!user) {
+            return res.status(HTTP_STATUS_CODE.NOT_FOUND).send({
+                status: "error",
+                message: "Không tìm thấy tài nguyên",
+            });
+        }
+
+        // Trả về thông tin user
+        return res.status(HTTP_STATUS_CODE.OK).send({
+            status: "success",
+            data: user,
+            message: "Lấy thông tin user thành công",
+        });
+    } catch (error) {
+        console.log(error);
+
+        return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send({
+            status: "error",
+            message: "Lỗi máy chủ",
+        });
+    }
+};
+
+/**
+ * API thêm một user mới vào hệ thông
  * @path /api/v1/users
  * @method POST
  * @param {express.Request} req
@@ -235,4 +275,5 @@ module.exports = {
     create,
     update,
     destroy,
+    show,
 };
