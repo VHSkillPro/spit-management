@@ -21,6 +21,12 @@ module.exports = {
                 updatedAt: new Date(),
             },
             {
+                route: "user.show",
+                name: "Xem chi tiết tài khoản",
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+            {
                 route: "user.create",
                 name: "Thêm tài khoản mới",
                 createdAt: new Date(),
@@ -49,7 +55,13 @@ module.exports = {
          * await queryInterface.bulkDelete('People', null, {});
          */
         await queryInterface.bulkDelete("Permissions", {
-            route: ["user.index", "user.create", "user.update", "user.destroy"],
+            route: [
+                "user.index",
+                "user.show",
+                "user.create",
+                "user.update",
+                "user.destroy",
+            ],
         });
     },
 };

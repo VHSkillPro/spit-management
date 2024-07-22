@@ -4,7 +4,7 @@ import { useAuth } from "./AuthContext";
 
 export const PermissionContext = createContext();
 
-export const PermissionProvider = ({ children }) => {
+export default function PermissionProvider({ children }) {
     const { user } = useAuth();
     const [permissions, setPermissions] = useState({});
 
@@ -28,7 +28,7 @@ export const PermissionProvider = ({ children }) => {
             {children}
         </PermissionContext.Provider>
     );
-};
+}
 
 export const usePermission = () => {
     return useContext(PermissionContext);

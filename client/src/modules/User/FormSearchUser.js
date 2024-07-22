@@ -54,14 +54,16 @@ export default function FormSearchUser({ onFind }) {
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                    <FormLabel className="fs-6">Role</FormLabel>
+                    <FormLabel className="fs-6">
+                        Chức vụ trong hệ thống
+                    </FormLabel>
                     <Form.Select
                         name="role"
                         value={roleId}
                         onChange={(e) => setRoleId(e.target.value)}
                     >
                         <option key={0} value={0}>
-                            Chọn role cần tìm kiếm
+                            Chọn chức vụ cần tìm kiếm
                         </option>
                         {roles.map((role, idx) => (
                             <option key={idx} value={role.id}>

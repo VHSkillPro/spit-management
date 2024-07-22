@@ -1,10 +1,6 @@
 import { usePermission } from "../contexts/PermissionContext";
 import Forbidden from "../pages/Forbidden";
 
-export const PERMISSIONS = {
-    user: "user.index",
-};
-
 const PermissionGuard = ({ children, route }) => {
     const { permissions } = usePermission();
 

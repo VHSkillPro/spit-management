@@ -4,7 +4,7 @@ import { logoutRef } from "../global";
 
 export const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
+export default function AuthProvider({ children }) {
     const [user, setUser] = useState({});
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }) => {
             {children}
         </AuthContext.Provider>
     );
-};
+}
 
 export const useAuth = () => {
     return useContext(AuthContext);

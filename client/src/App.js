@@ -1,16 +1,27 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
-import AuthGuard from "./guards/AuthGuard";
+
+// Contexts
+import AuthProvider from "./contexts/AuthContext";
 import MessageProvider from "./contexts/MessageContext";
-import Message from "./components/Message";
-import NotFound from "./pages/NotFound";
 import BreadcrumbProvider from "./contexts/BreadcrumbContext";
+import PermissionProvider from "./contexts/PermissionContext";
+
+// Guards
+import AuthGuard from "./guards/AuthGuard";
+import PermissionGuard from "./guards/PermissionGuard";
+
+// Pages
+import NotFound from "./pages/NotFound";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
+
+// Modules
 import User from "./modules/User";
 import DisplayUser from "./modules/User/DisplayUser";
-import { PermissionProvider } from "./contexts/PermissionContext";
-import PermissionGuard, { PERMISSIONS } from "./guards/PermissionGuard";
+import FormUpdateUser from "./modules/User/FormUpdateUser";
+
+// Components
+import Message from "./components/Message";
 
 export default function App() {
     return (
@@ -39,8 +50,16 @@ function App2() {
                     <Route
                         index
                         element={
-                            <PermissionGuard route={PERMISSIONS.user}>
+                            <PermissionGuard route={"user.index"}>
                                 <DisplayUser />
+                            </PermissionGuard>
+                        }
+                    />
+                    <Route
+                        path="/user/:username"
+                        element={
+                            <PermissionGuard route={"user.update"}>
+                                <FormUpdateUser />
                             </PermissionGuard>
                         }
                     />

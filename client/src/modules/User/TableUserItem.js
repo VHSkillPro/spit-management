@@ -2,6 +2,7 @@ import { Button } from "react-bootstrap";
 import { destroyUser } from "../../API/userService";
 import { ToastStatus } from "../../components/Toast";
 import { useMessage } from "../../contexts/MessageContext";
+import { NavLink } from "react-router-dom";
 
 export default function TableUserItem({
     id,
@@ -35,18 +36,19 @@ export default function TableUserItem({
 
     return (
         <tr className={(id + 1) % 2 ? "odd" : "even"}>
-            <td width={50}>{id + 1}</td>
+            <td>{id + 1}</td>
             <td className="text-truncate">{username}</td>
             <td className="text-truncate">{password}</td>
             <td>{role}</td>
-            <td width={250}>
+            <td>
                 <div className="d-flex justify-content-end">
-                    <Button size="sm" className="me-2">
-                        Đổi chức vụ
-                    </Button>
-                    <Button size="sm" className="me-2" title="Đổi mật khẩu">
-                        <i className="bi bi-key"></i>
-                    </Button>
+                    <NavLink
+                        to={`/user/${username}`}
+                        className="me-2 btn btn-primary btn-sm"
+                        title="Cập nhật thông tin"
+                    >
+                        <i className="bi bi-pencil-square"></i>
+                    </NavLink>
                     <Button
                         size="sm"
                         variant="danger"

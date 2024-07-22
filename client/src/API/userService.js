@@ -9,6 +9,14 @@ export const getAllUsers = (params) => {
     return api.get(uri);
 };
 
+export const getUserByUsername = (username) => {
+    return api.get(`v1/users/${username}`);
+};
+
+export const updateUser = (username, data) => {
+    return api.patch(`v1/users/${username}`, data);
+};
+
 export const destroyUser = (username) => {
     return api.delete(`v1/users/${username}`);
 };
