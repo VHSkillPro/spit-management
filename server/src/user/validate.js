@@ -4,16 +4,24 @@ const { checkValidationResult } = require("../../middleware/validator");
 const validateQueryUserIndex = [
     query("username").optional().notEmpty(),
     query("roleId").optional().isNumeric().toInt(),
-    query("limit").optional().isNumeric().toInt(),
-    query("offset").optional().isNumeric().toInt(),
+    query("limit")
+        .optional()
+        .isNumeric()
+        .toInt()
+        .custom((value) => value >= 0),
+    query("offset")
+        .optional()
+        .isNumeric()
+        .toInt()
+        .custom((value) => value >= 0),
     checkValidationResult,
 ];
 
 const validateRegister = [
-    body("username").notEmpty().isLength({ min: 5, max: 20 }).isAlphanumeric(),
+    body("username").notEmpty().isLength({ min: 5, max: 255 }).isAlphanumeric(),
     body("password")
         .notEmpty()
-        .isLength({ min: 6, max: 20 })
+        .isLength({ min: 6, max: 255 })
         .matches(/^[a-zA-Z0-9@.#$!%*?&^]+$/),
     body("repassword")
         .notEmpty()
@@ -29,7 +37,7 @@ const validateRegister = [
 const validateUpdateUser = [
     body("password")
         .optional()
-        .isLength({ min: 6, max: 20 })
+        .isLength({ min: 6, max: 255 })
         .matches(/^[a-zA-Z0-9@.#$!%*?&^]+$/),
     body("roleId").optional().isNumeric().toInt(),
     checkValidationResult,

@@ -49,7 +49,7 @@ const index = async (req, res) => {
             status: "success",
             data: {
                 users: users,
-                total: await db.User.count(),
+                total: await db.User.count(options),
             },
             message: "Lấy tất cả users thành công",
         });
