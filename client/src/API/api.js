@@ -37,16 +37,14 @@ api.interceptors.response.use(
         return response;
     },
     async (error) => {
-        const originRequest = error.config;
-
         // Nếu request không phải là refresh_tokens
         if (!isRefreshTokens) {
-            // Xác thực thất bại
+            // Nếu response trả về status 401 thì thử refresh_tokens
             if (error.response.status === 401) {
                 isRefreshTokens = true;
                 const refreshToken = cookies.get("refresh_token");
 
-                // Nếu có refreshToken
+                // Nếu có refresh_token thì thử refresh_tokens
                 if (refreshToken) {
                     try {
                         const response = await refreshTokensAPI();
@@ -65,6 +63,7 @@ api.interceptors.response.use(
                         });
 
                         isRefreshTokens = false;
+                        const originRequest = error.config;
                         return api(originRequest);
                     } catch (error) {
                         isRefreshTokens = false;
@@ -75,9 +74,6 @@ api.interceptors.response.use(
                     return logoutRef.current();
                 }
             }
-        } else if (error.response.status === 401) {
-            isRefreshTokens = false;
-            return logoutRef.current();
         }
 
         return Promise.reject(error);
