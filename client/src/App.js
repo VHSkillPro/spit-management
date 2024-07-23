@@ -15,14 +15,18 @@ import NotFound from "./pages/NotFound";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 
-// Modules Users
+// Modules User
 import User from "./modules/User";
 import DisplayUser from "./modules/User/DisplayUser";
 import FormUpdateUser from "./modules/User/FormUpdateUser";
 import FormAddUser from "./modules/User/FormAddUser";
 
+// Module Role
+import Role from "./modules/Role";
+
 // Components
 import Message from "./components/Message";
+import DisplayRole from "./modules/Role/DisplayRole";
 
 export default function App() {
     return (
@@ -69,6 +73,16 @@ function App2() {
                         element={
                             <PermissionGuard route={"user.show"}>
                                 <FormUpdateUser />
+                            </PermissionGuard>
+                        }
+                    />
+                </Route>
+                <Route path="/role" element={<Role />}>
+                    <Route
+                        index
+                        element={
+                            <PermissionGuard route={"role.index"}>
+                                <DisplayRole />
                             </PermissionGuard>
                         }
                     />
