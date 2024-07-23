@@ -12,6 +12,7 @@ import { getAllUsers } from "../../API/userService";
 import TableUser from "./TableUser";
 import FormSearchUser from "./FormSearchUser";
 import MyPagination from "../../components/MyPagination";
+import { NavLink } from "react-router-dom";
 
 export default function DisplayUser() {
     // Số lượng user của mỗi trang
@@ -35,10 +36,19 @@ export default function DisplayUser() {
     // State `paramsSearch` lưu thông tin tìm kiếm
     const [paramsSearch, setParamsSearch] = useState({});
 
+    // Cập nhật dữ liệu mỗi 5s một lần
+    useEffect(() => {
+        handleGetUsers();
+        const interval = setInterval(() => {
+            handleGetUsers();
+        }, 5000);
+        return () => clearInterval(interval);
+    }, [page, paramsSearch]);
+
     // Xử lý việc lấy danh sách users từ API
     const handleGetUsers = () => {
         const params = paramsSearch;
-        params.offset = (page - 1) * pageSize;
+        params.offset = Math.max((page - 1) * pageSize, 0);
         params.limit = pageSize;
 
         getAllUsers(params)
@@ -52,14 +62,18 @@ export default function DisplayUser() {
                     return user;
                 });
 
-                // Nếu page hiện tại lớn hơn số trang tối đa
-                if (page > Math.ceil(totalUsers / pageSize)) {
-                    setPage(Math.ceil(totalUsers / pageSize));
-                }
-
-                // Nếu page hiện tại nhỏ hơn 1
-                if (page < 1) {
+                if (totalUsers === 0) {
                     setPage(1);
+                } else {
+                    // Nếu page hiện tại lớn hơn số trang tối đa
+                    if (page > Math.ceil(totalUsers / pageSize)) {
+                        setPage(Math.ceil(totalUsers / pageSize));
+                    }
+
+                    // Nếu page hiện tại nhỏ hơn 1
+                    if (page < 1) {
+                        setPage(1);
+                    }
                 }
 
                 setTotal(totalUsers);
@@ -72,17 +86,7 @@ export default function DisplayUser() {
     // Xử lý tìm kiếm
     const handleFind = (params) => {
         setParamsSearch(params);
-        handleGetUsers();
     };
-
-    // Cập nhật dữ liệu mỗi 5s một lần
-    useEffect(() => {
-        handleGetUsers();
-        const interval = setInterval(() => {
-            handleGetUsers();
-        }, 5000);
-        return () => clearInterval(interval);
-    }, [page, paramsSearch]);
 
     // Hàm xử lý hiển thị nội dung
     const renderContent = () => {
@@ -117,9 +121,13 @@ export default function DisplayUser() {
                     Danh sách tài khoản
                 </CardTitle>
                 <div className="ms-auto">
-                    <Button title="Thêm tài khoản" size="sm">
+                    <NavLink
+                        to={`/user/add`}
+                        className="btn btn-primary btn-sm"
+                        title="Thêm tài khoản"
+                    >
                         <i className="bi bi-person-plus"></i>
-                    </Button>
+                    </NavLink>
                     <Button
                         title="Tìm kiếm"
                         size="sm"

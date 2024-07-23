@@ -15,10 +15,11 @@ import NotFound from "./pages/NotFound";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 
-// Modules
+// Modules Users
 import User from "./modules/User";
 import DisplayUser from "./modules/User/DisplayUser";
 import FormUpdateUser from "./modules/User/FormUpdateUser";
+import FormAddUser from "./modules/User/FormAddUser";
 
 // Components
 import Message from "./components/Message";
@@ -56,9 +57,17 @@ function App2() {
                         }
                     />
                     <Route
-                        path="/user/:username"
+                        path="/user/add"
                         element={
-                            <PermissionGuard route={"user.update"}>
+                            <PermissionGuard route={"user.create"}>
+                                <FormAddUser />
+                            </PermissionGuard>
+                        }
+                    />
+                    <Route
+                        path="/user/detail/:username"
+                        element={
+                            <PermissionGuard route={"user.show"}>
                                 <FormUpdateUser />
                             </PermissionGuard>
                         }

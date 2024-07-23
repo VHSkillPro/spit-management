@@ -43,7 +43,7 @@ export default function TableUserItem({
             <td>
                 <div className="d-flex justify-content-end">
                     <NavLink
-                        to={`/user/${username}`}
+                        to={`/user/detail/${username}`}
                         className="me-2 btn btn-primary btn-sm"
                         title="Cập nhật thông tin"
                     >

@@ -3,7 +3,7 @@ import Cookies from "universal-cookie";
 import { refreshTokensAPI } from "./authService";
 import { logoutRef } from "../global";
 
-const cookies = new Cookies();
+const cookies = new Cookies(null, { path: "/" });
 
 const api = axios.create({
     baseURL: "//localhost:3000/api",

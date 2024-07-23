@@ -5,7 +5,7 @@ import { useMessage } from "../contexts/MessageContext";
 import { ToastStatus } from "../components/Toast";
 import Cookies from "universal-cookie";
 
-const cookies = new Cookies();
+const cookies = new Cookies(null, { path: "/" });
 
 export default function Header({ toggleSideBar }) {
     const { user, logout } = useAuth();

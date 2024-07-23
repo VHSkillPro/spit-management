@@ -13,6 +13,10 @@ export const getUserByUsername = (username) => {
     return api.get(`v1/users/${username}`);
 };
 
+export const createUser = (data) => {
+    return api.post("v1/users", data);
+};
+
 export const updateUser = (username, data) => {
     return api.patch(`v1/users/${username}`, data);
 };

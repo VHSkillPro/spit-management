@@ -5,6 +5,7 @@ import {
     CardBody,
     CardHeader,
     CardTitle,
+    Form,
     FormControl,
     FormGroup,
     FormLabel,
@@ -16,23 +17,25 @@ import { getUserByUsername, updateUser } from "../../API/userService";
 import { useMessage } from "../../contexts/MessageContext";
 import { ToastStatus } from "../../components/Toast";
 import { getAllRoles } from "../../API/roleService";
+import { useForm } from "react-hook-form";
 
 export default function FormUpdateUser() {
-    const navigate = useNavigate();
     const params = useParams();
-    const [roles, setRoles] = useState();
+    const navigate = useNavigate();
     const { handleAddMessage } = useMessage();
 
-    const [newPassword, setNewPassword] = useState("");
-    const [newRoleId, setNewRoleId] = useState();
+    const [roles, setRoles] = useState([]);
+    const [user, setUser] = useState({});
+
+    const { register, handleSubmit } = useForm();
 
     useEffect(() => {
         Promise.all([getUserByUsername(params.username), getAllRoles()])
             .then((values) => {
                 const user = values[0].data.data;
                 const roles = values[1].data.data.roles;
+                setUser(user);
                 setRoles(roles);
-                setNewRoleId(user.roleId);
             })
             .catch((error) => {
                 handleAddMessage(
@@ -46,19 +49,19 @@ export default function FormUpdateUser() {
             });
     }, [params]);
 
-    const handleUpdate = () => {
+    const handleUpdate = (data) => {
         if (window.confirm("Xác nhận cập nhật thông tin tài khoản?")) {
-            const data = {};
+            const user = {};
 
-            if (newPassword) {
-                data.password = newPassword;
+            if (data.password) {
+                user.password = data.password;
             }
 
-            if (newRoleId) {
-                data.roleId = newRoleId;
+            if (parseInt(data.roleId)) {
+                user.roleId = parseInt(data.roleId);
             }
 
-            updateUser(params.username, data)
+            updateUser(params.username, user)
                 .then(() => {
                     handleAddMessage(
                         "Thành công",
@@ -85,31 +88,33 @@ export default function FormUpdateUser() {
                 </CardTitle>
             </CardHeader>
             <CardBody>
-                <FormGroup className="mb-3">
-                    <FormLabel className="fs-6">Tên tài khoản</FormLabel>
-                    <FormControl value={params.username} disabled></FormControl>
-                </FormGroup>
-                <FormGroup className="mb-3">
-                    <FormLabel className="fs-6">Mật khẩu mới</FormLabel>
-                    <FormControl
-                        value={newPassword}
-                        placeholder="Nhập mật khẩu mới"
-                        onChange={(e) => setNewPassword(e.target.value)}
-                    ></FormControl>
-                    <FormText>
-                        * Để trống trường này nếu không đổi mật khẩu
-                    </FormText>
-                </FormGroup>
-                {roles && (
+                <Form onSubmit={handleSubmit(handleUpdate)}>
+                    <FormGroup className="mb-3">
+                        <FormLabel className="fs-6">Tên tài khoản</FormLabel>
+                        <FormControl
+                            value={params.username}
+                            disabled
+                        ></FormControl>
+                    </FormGroup>
+                    <FormGroup className="mb-3">
+                        <FormLabel className="fs-6">Mật khẩu mới</FormLabel>
+                        <FormControl
+                            placeholder="Nhập mật khẩu mới"
+                            {...register("password")}
+                        ></FormControl>
+                        <ul>
+                            <li>
+                                <FormText>
+                                    Để trống trường này nếu không đổi mật khẩu
+                                </FormText>
+                            </li>
+                        </ul>
+                    </FormGroup>
                     <FormGroup className="mb-3">
                         <FormLabel className="fs-6">
                             Chức vụ trong hệ thống
                         </FormLabel>
-                        <FormSelect
-                            name="role"
-                            value={newRoleId}
-                            onChange={(e) => setNewRoleId(e.target.value)}
-                        >
+                        <FormSelect value={user.roleId} {...register("roleId")}>
                             {roles.map((role, idx) => (
                                 <option key={idx} value={role.id}>
                                     {role.name}
@@ -117,12 +122,13 @@ export default function FormUpdateUser() {
                             ))}
                         </FormSelect>
                     </FormGroup>
-                )}
-                <FormGroup className="d-flex justify-content-center">
-                    <Button size="sm" onClick={handleUpdate}>
-                        Cập nhật
-                    </Button>
-                </FormGroup>
+                    <FormGroup className="d-flex justify-content-center">
+                        <Button type="submit">
+                            <i className="bi bi-pencil-square me-2"></i>
+                            Cập nhật
+                        </Button>
+                    </FormGroup>
+                </Form>
             </CardBody>
         </Card>
     );

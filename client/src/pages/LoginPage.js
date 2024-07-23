@@ -1,36 +1,36 @@
-import { useState } from "react";
-import { ToastStatus } from "../components/Toast";
-import { useAuth } from "../contexts/AuthContext";
+import { useForm } from "react-hook-form";
+import Cookies from "universal-cookie";
+import InputGroupText from "react-bootstrap/esm/InputGroupText";
 import {
     Button,
     Card,
     CardBody,
-    Col,
+    Form,
     FormControl,
+    FormGroup,
+    FormText,
     InputGroup,
-    Row,
 } from "react-bootstrap";
-import InputGroupText from "react-bootstrap/esm/InputGroupText";
+import { ToastStatus } from "../components/Toast";
+import { useAuth } from "../contexts/AuthContext";
 import { loginAPI } from "../API/authService";
 import { useMessage } from "../contexts/MessageContext";
-import Cookies from "universal-cookie";
 
-const cookies = new Cookies();
+const cookies = new Cookies(null, { path: "/" });
 
 export default function LoginPage() {
     const { login } = useAuth();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm();
     const { handleAddMessage } = useMessage();
 
-    const [username, setUsername] = useState(null);
-    const [password, setPassword] = useState(null);
-
-    // Handle enter key
-    const handleKeyDown = (event) => {
-        if (event.key === "Enter") handleLogin();
-    };
-
     // Handle login
-    const handleLogin = () => {
+    const handleLogin = (data) => {
+        const { username, password } = data;
+
         loginAPI(username, password)
             .then((response) => {
                 // Set cookies
@@ -56,7 +56,7 @@ export default function LoginPage() {
                     ToastStatus.SUCCESS
                 );
             })
-            .catch(function (error) {
+            .catch(function () {
                 handleAddMessage(
                     `Đăng nhập thất bại`,
                     "Tài khoản hoặc mật khẩu không chính xác",
@@ -87,62 +87,60 @@ export default function LoginPage() {
                     {/* Login Card */}
                     <Card className="w-100 rounded-3">
                         <CardBody className="login-card-body rounded-3">
-                            <div className="mb-3">
-                                <InputGroup>
-                                    <FormControl
-                                        name="username"
-                                        type="text"
-                                        placeholder="Tên đăng nhập"
-                                        onChange={(e) => {
-                                            setUsername(e.target.value || null);
-                                        }}
-                                    ></FormControl>
-                                    <InputGroupText>
-                                        <span className="bi bi-person" />
-                                    </InputGroupText>
-                                </InputGroup>
-                            </div>
-                            <div className="mb-3">
-                                <InputGroup>
-                                    <FormControl
-                                        name="password"
-                                        type="password"
-                                        placeholder="Mật khẩu"
-                                        onChange={(e) => {
-                                            setPassword(e.target.value || null);
-                                        }}
-                                        onKeyDown={handleKeyDown}
-                                    ></FormControl>
-                                    <InputGroupText>
-                                        <span className="bi bi-lock-fill" />
-                                    </InputGroupText>
-                                </InputGroup>
-                            </div>
-                            <Row>
-                                <Col xs={12}>
-                                    <div className="d-grid gap-2">
-                                        <Button
-                                            variant="primary"
-                                            onClick={handleLogin}
-                                        >
-                                            <i className="bi bi-box-arrow-in-right me-2"></i>
-                                            Đăng nhập
-                                        </Button>
-                                    </div>
-                                </Col>
-                            </Row>
-                            <Row className="mt-3">
-                                <Col xs={6}>
-                                    <p>
-                                        <a
-                                            href="#"
-                                            className="text-decoration-none"
-                                        >
-                                            Quên mật khẩu
-                                        </a>
-                                    </p>
-                                </Col>
-                            </Row>
+                            <Form onSubmit={handleSubmit(handleLogin)}>
+                                <FormGroup className="mb-3">
+                                    <InputGroup>
+                                        <FormControl
+                                            {...register("username", {
+                                                required: true,
+                                            })}
+                                            type="text"
+                                            placeholder="Tên đăng nhập"
+                                        ></FormControl>
+                                        <InputGroupText>
+                                            <span className="bi bi-person" />
+                                        </InputGroupText>
+                                    </InputGroup>
+                                    {errors.username?.type === "required" && (
+                                        <FormText className="text-danger">
+                                            Tên tài khoản không được để trống
+                                        </FormText>
+                                    )}
+                                </FormGroup>
+                                <FormGroup className="mb-3">
+                                    <InputGroup>
+                                        <FormControl
+                                            {...register("password", {
+                                                required: true,
+                                            })}
+                                            type="password"
+                                            placeholder="Mật khẩu"
+                                        ></FormControl>
+                                        <InputGroupText>
+                                            <span className="bi bi-lock-fill" />
+                                        </InputGroupText>
+                                    </InputGroup>
+                                    {errors.password?.type === "required" && (
+                                        <FormText className="text-danger">
+                                            Mật khẩu không được để trống
+                                        </FormText>
+                                    )}
+                                </FormGroup>
+                                <div className="d-grid gap-2">
+                                    <Button variant="primary" type="submit">
+                                        <i className="bi bi-box-arrow-in-right me-2"></i>
+                                        Đăng nhập
+                                    </Button>
+                                </div>
+                                <div className="mt-3">
+                                    <a
+                                        href="#"
+                                        className="text-decoration-none"
+                                    >
+                                        Quên mật khẩu
+                                    </a>
+                                </div>
+                            </Form>
                         </CardBody>
                     </Card>
                 </div>
