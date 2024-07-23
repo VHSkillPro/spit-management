@@ -75,6 +75,14 @@ export default function SideBar() {
                                     </NavLink>
                                 </Nav.Item>
                             )}
+                            {permissions["role.index"] && (
+                                <Nav.Item as="li">
+                                    <NavLink to="/role" className="nav-link">
+                                        <i className="nav-icon bi bi-person-gear"></i>
+                                        <p>Chức vụ</p>
+                                    </NavLink>
+                                </Nav.Item>
+                            )}
                         </Nav>
                     </nav>
                 </div>
