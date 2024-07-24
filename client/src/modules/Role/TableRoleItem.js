@@ -29,7 +29,7 @@ export default function TableRoleItem({ role, onChange }) {
 
     return (
         <tr className={role.idx % 2 ? "odd" : "even"}>
-            <td>{role.idx}</td>
+            <td width={60}>{role.idx}</td>
             <td>{role.name}</td>
             <td>
                 <div className="d-flex justify-content-end">

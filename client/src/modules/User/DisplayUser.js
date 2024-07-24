@@ -30,9 +30,6 @@ export default function DisplayUser() {
     // State `displaySearch` lưu trạng thái ẩn/hiện của bảng tìm kiếm
     const [displaySearch, setDisplaySearch] = useState(false);
 
-    // State `isLoading` thể hiễn đã lấy được danh sách users chưa
-    const [isLoading, setIsLoading] = useState(true);
-
     // State `paramsSearch` lưu thông tin tìm kiếm
     const [paramsSearch, setParamsSearch] = useState({});
 
@@ -78,7 +75,6 @@ export default function DisplayUser() {
 
                 setTotal(totalUsers);
                 setUsers(usersFromAPI);
-                setIsLoading(false);
             })
             .catch(() => {});
     };
@@ -108,11 +104,6 @@ export default function DisplayUser() {
             </Row>
         );
     };
-
-    // Nếu chưa có danh sách users
-    if (isLoading) {
-        return <div>Loading...</div>;
-    }
 
     return (
         <Card>
