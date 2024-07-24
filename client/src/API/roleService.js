@@ -11,3 +11,7 @@ export const getPermissionsOfRole = (roleId) => {
 export const createRole = (role) => {
     return api.post("v1/roles", role);
 };
+
+export const destroyRole = (roleId) => {
+    return api.delete(`v1/roles/${roleId}`);
+};

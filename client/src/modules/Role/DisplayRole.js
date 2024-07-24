@@ -60,7 +60,7 @@ export default function DisplayRole() {
             <CardBody>
                 <Row>
                     <Col>
-                        <TableRole roles={roles} />
+                        <TableRole roles={roles} onChange={handleGetRoles} />
                     </Col>
                 </Row>
                 <Row>
