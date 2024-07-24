@@ -48,7 +48,7 @@ export default function FormAddRole() {
     return (
         <Card>
             <CardHeader className="d-flex align-items-center">
-                <CardTitle className="fw-bold fs-5">Thêm tài khoản</CardTitle>
+                <CardTitle className="fw-bold fs-5">Thêm chức vụ</CardTitle>
             </CardHeader>
             <CardBody>
                 <Form onSubmit={handleSubmit(handleAddRole)}>

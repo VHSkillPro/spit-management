@@ -4,8 +4,12 @@ export const getAllRoles = () => {
     return api.get("v1/roles");
 };
 
-export const getPermissionsOfRole = (roleId) => {
+export const getRoleById = (roleId) => {
     return api.get(`v1/roles/${roleId}`);
+};
+
+export const getPermissionsOfRole = (roleId) => {
+    return api.get(`v1/roles/${roleId}/permissions`);
 };
 
 export const createRole = (role) => {

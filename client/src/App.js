@@ -28,6 +28,7 @@ import Role from "./modules/Role";
 import Message from "./components/Message";
 import DisplayRole from "./modules/Role/DisplayRole";
 import FormAddRole from "./modules/Role/FormAddRole";
+import FormUpdateRole from "./modules/Role/FormUpdateRole";
 
 export default function App() {
     return (
@@ -92,6 +93,14 @@ function App2() {
                         element={
                             <PermissionGuard route={"role.create"}>
                                 <FormAddRole />
+                            </PermissionGuard>
+                        }
+                    />
+                    <Route
+                        path="/role/detail/:roleId"
+                        element={
+                            <PermissionGuard route={"role.show"}>
+                                <FormUpdateRole />
                             </PermissionGuard>
                         }
                     />

@@ -90,7 +90,9 @@ const show = async (req, res) => {
         // Trả về thông tin user
         return res.status(HTTP_STATUS_CODE.OK).send({
             status: "success",
-            data: user,
+            data: {
+                user: user,
+            },
             message: "Lấy thông tin user thành công",
         });
     } catch (error) {
@@ -185,6 +187,20 @@ const update = async (req, res) => {
 
         // Nếu có roleId mới
         if (req.body.roleId) {
+            if (req.params.username === "admin") {
+                return res.status(HTTP_STATUS_CODE.BAD_REQUEST).send({
+                    status: "error",
+                    message: "Không thể thay đổi chức vụ của tài khoản này",
+                });
+            }
+
+            if (req.body.roleId === 1) {
+                return res.status(HTTP_STATUS_CODE.BAD_REQUEST).send({
+                    status: "error",
+                    message: "Không thể sử dụng chức vụ này",
+                });
+            }
+
             const role = db.Role.findOne({
                 where: { id: req.body.roleId },
             });

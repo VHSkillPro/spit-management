@@ -20,6 +20,12 @@ module.exports = {
                 updatedAt: new Date(),
             },
             {
+                route: "role.show",
+                name: "Xem chi tiết chức vụ trong hệ thống",
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+            {
                 route: "role.create",
                 name: "Thêm chức vụ mới trong hệ thống",
                 createdAt: new Date(),
@@ -47,5 +53,14 @@ module.exports = {
          * Example:
          * await queryInterface.bulkDelete('People', null, {});
          */
+        await queryInterface.bulkDelete("Permissions", {
+            route: [
+                "role.index",
+                "role.show",
+                "role.create",
+                "role.update",
+                "role.destroy",
+            ],
+        });
     },
 };

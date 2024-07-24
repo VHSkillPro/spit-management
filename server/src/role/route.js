@@ -12,6 +12,13 @@ const { checkPermission } = require("../auth/middleware");
 router.get("/", checkPermission("role.index"), service.index);
 
 /**
+ * API lấy thông tin role
+ * @path /api/v1/roles/:roleId
+ * @method GET
+ */
+router.get("/:roleId", checkPermission("role.show"), service.show);
+
+/**
  * API tạo mới role
  * @path /api/v1/roles
  * @method POST
@@ -44,9 +51,9 @@ router.delete("/:roleId", checkPermission("role.destroy"), service.destroy);
 
 /**
  * API lấy danh sách quyền của role
- * @path /api/v1/roles/:roleId
+ * @path /api/v1/roles/:roleId/permissions
  * @method GET
  */
-router.get("/:roleId", service.permissions);
+router.get("/:roleId/permissions", service.permissions);
 
 module.exports = router;

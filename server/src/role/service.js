@@ -19,7 +19,37 @@ const index = async (req, res) => {
             data: {
                 roles: roles,
             },
-            message: "Lấy tất cả roles thành công",
+            message: "Lấy tất cả chức vụ thành công",
+        });
+    } catch (error) {
+        console.log(error);
+
+        return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send({
+            status: "error",
+            message: "Lỗi máy chủ",
+        });
+    }
+};
+
+/**
+ * API trả về thông tin của role
+ * @path /api/v1/roles/:roleId
+ * @method GET
+ * @param {express.Request} req
+ * @param {express.Response} res
+ */
+const show = async (req, res) => {
+    try {
+        // Lấy tất cả roles từ database
+        const roleId = req.params.roleId;
+        const role = await db.Role.findOne({ where: { id: roleId } });
+
+        return res.status(HTTP_STATUS_CODE.OK).send({
+            status: "success",
+            data: {
+                role: role,
+            },
+            message: "Lấy thông tin chức vụ thành công",
         });
     } catch (error) {
         console.log(error);
@@ -75,6 +105,16 @@ const update = async (req, res) => {
     try {
         // Lấy role cần chỉnh sửa
         const roleId = req.params.roleId;
+
+        // Kiểm tra xem role có phải là admin không
+        if (roleId == 1) {
+            return res.status(HTTP_STATUS_CODE.BAD_REQUEST).send({
+                status: "error",
+                message: "Không thể chỉnh sửa chức vụ này",
+            });
+        }
+
+        // Kiểm tra xem role có tồn tại không
         const role = await db.Role.findOne({ where: { id: roleId } });
 
         if (!role) {
@@ -118,6 +158,15 @@ const destroy = async (req, res) => {
     try {
         // Lấy role cần xóa
         const roleId = req.params.roleId;
+
+        // Kiểm tra xem role có phải là admin không
+        if (roleId == 1) {
+            return res.status(HTTP_STATUS_CODE.BAD_REQUEST).send({
+                status: "error",
+                message: "Không thể xóa chức vụ này",
+            });
+        }
+
         const role = await db.Role.findOne({ where: { id: roleId } });
 
         // Kiểm tra xem role có tồn tại không
@@ -164,7 +213,7 @@ const destroy = async (req, res) => {
 
 /**
  * API lấy danh sách quyền của role
- * @path /api/v1/roles/:roleId
+ * @path /api/v1/roles/:roleId/permissions
  * @method GET
  * @param {express.Request} req
  * @param {express.Response} res
@@ -216,6 +265,7 @@ const permissions = async (req, res) => {
 
 module.exports = {
     index,
+    show,
     create,
     update,
     destroy,
