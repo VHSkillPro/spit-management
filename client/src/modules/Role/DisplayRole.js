@@ -63,6 +63,13 @@ export default function DisplayRole() {
                         <TableRole roles={roles} />
                     </Col>
                 </Row>
+                <Row>
+                    <Col>
+                        <div className="dataTables_info">
+                            {`Hiển thị ${roles.length} chức vụ`}
+                        </div>
+                    </Col>
+                </Row>
             </CardBody>
         </Card>
     );
