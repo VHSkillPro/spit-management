@@ -138,7 +138,8 @@ const destroy = async (req, res) => {
         if (users) {
             return res.status(HTTP_STATUS_CODE.BAD_REQUEST).send({
                 status: "error",
-                message: "Không thể xóa role này vì có người dùng đang sử dụng",
+                message:
+                    "Không thể xóa chức vụ này vì có người dùng đang sử dụng",
             });
         }
 
@@ -149,7 +150,7 @@ const destroy = async (req, res) => {
 
         return res.status(HTTP_STATUS_CODE.OK).send({
             status: "success",
-            message: "Xóa role thành công",
+            message: "Xóa chức vụ thành công",
         });
     } catch (error) {
         console.log(error);
