@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const db = require("../../models");
 
 /**
@@ -33,7 +34,14 @@ const havePermission = async (roleId, permissionId) => {
     const count = await db.Role.count({
         where: {
             id: roleId,
-            "$permissions.id$": permissionId,
+            [Op.or]: [
+                {
+                    "$permissions.id$": permissionId,
+                },
+                {
+                    isRoot: true,
+                },
+            ],
         },
         include: "permissions",
     });
