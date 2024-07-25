@@ -15,49 +15,53 @@ module.exports = {
          * }], {});
          */
 
-        const saltRounds = 10;
-        const password = "admin";
+        await queryInterface.sequelize.transaction(async (t) => {
+            const saltRounds = 10;
+            const password = "admin";
 
-        const salt = bcrypt.genSaltSync(saltRounds);
-        const hash = bcrypt.hashSync(password, salt);
+            const salt = bcrypt.genSaltSync(saltRounds);
+            const hash = bcrypt.hashSync(password, salt);
 
-        await queryInterface.bulkInsert(
-            "Roles",
-            [
-                {
-                    name: "Quản trị viên",
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                },
-                {
-                    name: "Quản lý",
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                },
-                {
-                    name: "Thành viên",
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                },
-            ],
-            {}
-        );
+            await queryInterface.bulkInsert(
+                "Roles",
+                [
+                    {
+                        id: "admin",
+                        name: "Quản trị viên",
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    },
+                    {
+                        id: "manager",
+                        name: "Quản lý",
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    },
+                    {
+                        id: "member",
+                        name: "Thành viên",
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    },
+                ],
+                {}
+            );
 
-        await queryInterface.bulkInsert(
-            "Users",
-            [
-                {
-                    username: "admin",
-                    password: hash,
-                    roleId: 1,
-                    refreshToken: null,
-                    isAdmin: true,
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                },
-            ],
-            {}
-        );
+            await queryInterface.bulkInsert(
+                "Users",
+                [
+                    {
+                        username: "admin",
+                        password: hash,
+                        roleId: "admin",
+                        refreshToken: null,
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    },
+                ],
+                {}
+            );
+        });
     },
 
     async down(queryInterface, Sequelize) {
@@ -67,7 +71,9 @@ module.exports = {
          * Example:
          * await queryInterface.bulkDelete('People', null, {});
          */
-        await queryInterface.bulkDelete("Users", null, {});
-        await queryInterface.bulkDelete("Roles", null, {});
+        await queryInterface.sequelize.transaction(async (t) => {
+            await queryInterface.bulkDelete("Users", null, {});
+            await queryInterface.bulkDelete("Roles", null, {});
+        });
     },
 };

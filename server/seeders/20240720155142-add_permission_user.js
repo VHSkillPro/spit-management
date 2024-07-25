@@ -15,31 +15,31 @@ module.exports = {
 
         await queryInterface.bulkInsert("Permissions", [
             {
-                route: "user.index",
+                id: "user.index",
                 name: "Xem danh sách tài khoản",
                 createdAt: new Date(),
                 updatedAt: new Date(),
             },
             {
-                route: "user.show",
+                id: "user.show",
                 name: "Xem chi tiết tài khoản",
                 createdAt: new Date(),
                 updatedAt: new Date(),
             },
             {
-                route: "user.create",
+                id: "user.create",
                 name: "Thêm tài khoản mới",
                 createdAt: new Date(),
                 updatedAt: new Date(),
             },
             {
-                route: "user.update",
+                id: "user.update",
                 name: "Cập nhật thông tin tài khoản",
                 createdAt: new Date(),
                 updatedAt: new Date(),
             },
             {
-                route: "user.destroy",
+                id: "user.destroy",
                 name: "Xoá tài khoản",
                 createdAt: new Date(),
                 updatedAt: new Date(),
@@ -55,7 +55,7 @@ module.exports = {
          * await queryInterface.bulkDelete('People', null, {});
          */
         await queryInterface.bulkDelete("Permissions", {
-            route: [
+            id: [
                 "user.index",
                 "user.show",
                 "user.create",
