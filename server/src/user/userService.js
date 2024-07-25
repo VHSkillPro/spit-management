@@ -1,5 +1,8 @@
 const db = require("../../models");
 const { Op } = require("sequelize");
+const AppError = require("../../utils/AppError");
+const { StatusCodes } = require("http-status-codes");
+const userMessage = require("./userMessage");
 
 /**
  * Đếm số lượng tài khoản
@@ -69,18 +72,27 @@ const getAllUsers = async (query) => {
  * @returns {Promise<User>} Thông tin tài khoản
  */
 const getUserByUsername = async (username) => {
-    const user = await db.User.findOne({ where: { username } });
+    const user = await db.User.findOne({
+        where: { username },
+        include: "role",
+    });
     return user;
 };
 
 /**
- *
- * @param {object} data - Thông tin tài khoản mới
+ * Tạo tài khoản mới
+ * @param {object} user - Thông tin tài khoản mới
  * - username: string
  * - password: string
  * - roleId: int
+ * - refreshToken: string
+ * @returns {Promise<void>}
  */
-const createUser = async (data) => {};
+const createUser = async (user) => {
+    await db.sequelize.transaction(async (t) => {
+        await db.User.create(user);
+    });
+};
 
 /**
  * Xóa tài khoản
@@ -97,5 +109,6 @@ module.exports = {
     getAllUsers,
     getUserByUsername,
     countAllUsers,
+    createUser,
     destroyUser,
 };

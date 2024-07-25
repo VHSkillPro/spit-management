@@ -28,6 +28,7 @@ module.exports = {
                     {
                         id: "admin",
                         name: "Quản trị viên",
+                        isRoot: true,
                         createdAt: new Date(),
                         updatedAt: new Date(),
                     },
