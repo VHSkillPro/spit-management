@@ -22,12 +22,24 @@ module.exports = {
         const hash = bcrypt.hashSync(password, salt);
 
         await queryInterface.bulkInsert(
+            "Roles",
+            [
+                {
+                    name: "admin",
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+            ],
+            {}
+        );
+
+        await queryInterface.bulkInsert(
             "Users",
             [
                 {
                     username: "admin",
                     password: hash,
-                    role: 2,
+                    roleId: 1,
                     refreshToken: null,
                     createdAt: new Date(),
                     updatedAt: new Date(),
@@ -45,5 +57,6 @@ module.exports = {
          * await queryInterface.bulkDelete('People', null, {});
          */
         await queryInterface.bulkDelete("Users", null, {});
+        await queryInterface.bulkDelete("Roles", null, {});
     },
 };

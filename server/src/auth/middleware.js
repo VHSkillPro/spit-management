@@ -62,6 +62,10 @@ const checkPermission = (permission) => {
      */
     return async (req, res, next) => {
         try {
+            if (req.roleId === 1) {
+                return next();
+            }
+
             // Lấy quyền trong database
             const rolePermission = await db.Role.findOne({
                 where: {
