@@ -12,14 +12,16 @@ module.exports = {
          *   isBetaMember: false
          * }], {});
          */
-        await queryInterface.bulkInsert("Permissions", [
-            {
-                route: "permission.index",
-                name: "Xem danh sách quyền",
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            },
-        ]);
+        await queryInterface.sequelize.transaction(async (t) => {
+            await queryInterface.bulkInsert("Permissions", [
+                {
+                    id: "permission.index",
+                    name: "Xem danh sách quyền",
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+            ]);
+        });
     },
 
     async down(queryInterface, Sequelize) {
@@ -29,8 +31,10 @@ module.exports = {
          * Example:
          * await queryInterface.bulkDelete('People', null, {});
          */
-        await queryInterface.bulkDelete("Permissions", {
-            route: ["permission.index"],
+        await queryInterface.sequelize.transaction(async (t) => {
+            await queryInterface.bulkDelete("Permissions", {
+                id: ["permission.index"],
+            });
         });
     },
 };
