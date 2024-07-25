@@ -19,13 +19,13 @@ module.exports = (sequelize, DataTypes) => {
 
     Permission.init(
         {
+            id: {
+                allowNull: false,
+                primaryKey: true,
+                type: DataTypes.STRING,
+            },
             name: {
                 type: DataTypes.STRING,
-                allowNull: false,
-            },
-            route: {
-                type: DataTypes.STRING,
-                unique: true,
                 allowNull: false,
             },
         },

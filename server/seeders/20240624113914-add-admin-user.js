@@ -25,7 +25,17 @@ module.exports = {
             "Roles",
             [
                 {
-                    name: "admin",
+                    name: "Quản trị viên",
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    name: "Quản lý",
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    name: "Thành viên",
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
@@ -41,6 +51,7 @@ module.exports = {
                     password: hash,
                     roleId: 1,
                     refreshToken: null,
+                    isAdmin: true,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },

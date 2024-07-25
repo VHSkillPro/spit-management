@@ -6,14 +6,8 @@ module.exports = {
         await queryInterface.createTable("Permissions", {
             id: {
                 allowNull: false,
-                autoIncrement: true,
                 primaryKey: true,
-                type: Sequelize.INTEGER,
-            },
-            route: {
                 type: Sequelize.STRING,
-                unique: true,
-                allowNull: false,
             },
             name: {
                 type: Sequelize.STRING,

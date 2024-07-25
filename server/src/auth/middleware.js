@@ -37,6 +37,11 @@ const isAuthenticated = async (req, res, next) => {
         req.username = verified.username;
         req.roleId = verified.roleId;
 
+        req.user = {
+            username: verified.username,
+            roleId: verified.roleId,
+        };
+
         // Đưa request tới tác vụ tiếp theo
         return next();
     } catch (error) {

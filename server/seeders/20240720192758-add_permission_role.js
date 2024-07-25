@@ -12,6 +12,7 @@ module.exports = {
          *   isBetaMember: false
          * }], {});
          */
+
         await queryInterface.bulkInsert("Permissions", [
             {
                 route: "role.index",
