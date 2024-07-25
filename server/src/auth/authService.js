@@ -43,4 +43,5 @@ const havePermission = async (roleId, permissionId) => {
 module.exports = {
     updateRefreshToken,
     getUserByUsername,
+    havePermission,
 };

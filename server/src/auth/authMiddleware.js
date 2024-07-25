@@ -56,7 +56,12 @@ const checkPermission = (permission) => {
     return async (req, res, next) => {
         try {
             // Kiểm tra quyền truy cập
-            if (!authService.havePermission(req.user.roleId, permission)) {
+            const valid = await authService.havePermission(
+                req.user.roleId,
+                permission
+            );
+
+            if (!valid) {
                 return next(
                     new AppError(StatusCodes.FORBIDDEN, authMessage.FORBIDDEN)
                 );
