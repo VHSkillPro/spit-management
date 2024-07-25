@@ -30,6 +30,12 @@ const getUserByUsername = async (username) => {
     return user;
 };
 
+/**
+ * Kiểm tra quyền permissionId của roleId
+ * @param {string} roleId
+ * @param {string} permissionId
+ * @returns
+ */
 const havePermission = async (roleId, permissionId) => {
     const count = await db.Role.count({
         where: {
