@@ -19,22 +19,21 @@ module.exports = (sequelize, DataTypes) => {
     User.init(
         {
             username: {
-                type: DataTypes.STRING,
+                primaryKey: true,
                 allowNull: false,
-                unique: true,
+                type: DataTypes.STRING,
             },
             password: {
-                type: DataTypes.STRING,
                 allowNull: false,
-                unique: true,
+                type: DataTypes.STRING,
             },
             roleId: {
-                type: DataTypes.INTEGER,
                 allowNull: false,
+                type: DataTypes.STRING,
             },
             refreshToken: {
-                type: DataTypes.STRING,
                 unique: true,
+                type: DataTypes.STRING,
             },
         },
         {
