@@ -1,0 +1,30 @@
+post:
+    tags:
+        - auth
+    summary: Làm mới token
+    parameters:
+        - in: header
+          name: Authorization
+          required: true
+          schema:
+            type: string
+            format: JWT
+            example: Bearer {refresh_token}
+    responses:
+        200:
+            description: Làm mới token thành công
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            data:
+                                $ref: '#/components/schemas/Tokens'
+                            message:
+                                type: string
+                                example: Làm mới token thành công
+        401:
+            $ref: '#/components/responses/Unauthorized'
+        500:
+            $ref: '#/components/responses/InternalServerError'
+    

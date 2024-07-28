@@ -1,0 +1,68 @@
+Tokens:
+    type: object
+    properties:
+        access_token:
+            type: string
+            example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzIxMjM2NDkwLCJleHAiOjE3MjEyMzcwOTB9.-8CJWfogS4m6cUepooYinyzsUuOBsm_NgGZIeZZoASU
+        refresh_token:
+            type: string
+            example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzIxMjM2NDkwLCJleHAiOjE3MjEzMjI4OTB9.Vqdls-RFj2IAnjvuMnDWoUFKvPKl0haokK7WLOi1slE
+
+Error:
+    type: object
+    properties:
+        message:
+            type: string
+    examples:
+        BadRequestError:
+            value:
+                message: Yêu cầu không hợp lệ
+        UnauthorizedError:
+            value:
+                message: Truy cập trái phép
+        ForbiddenError:
+            value:
+                message: Không có quyền truy cập
+        InternalServerError:
+            value:
+                message: Lỗi máy chủ
+
+ListUser:
+    type: array
+    items:
+        -$ref: '#/components/schemas/User'
+
+User:
+    type: object
+    properties:
+        username:
+            type: string
+        password:
+            type: string
+        roleId:
+            type: string
+        refreshToken:
+            type: string
+        createAt:
+            type: string
+        updateAt:
+            type: string
+    examples:
+        default:
+            value:
+                password: $2b$10$bFOMxEyidWvQoy5.gmTcMezzH805sO9CJf706wCVUB24m/a2ECiNO
+                refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzIxMjM2NDkwLCJleHAiOjE3MjEzMjI4OTB9.Vqdls-RFj2IAnjvuMnDWoUFKvPKl0haokK7WLOi1slE
+                createAt: "2024-07-25T16:57:34.000Z"
+                updateAt: "2024-07-26T15:03:54.000Z"
+        admin:
+            allOf:
+                - $ref: '#/components/schemas/User/examples/default'    
+                - value:  
+                    username: admin
+                    roleId: admin
+        member:
+            allOf:
+                - $ref: '#/components/schemas/User/examples/default'    
+                - value:  
+                    username: member
+                    roleId: member

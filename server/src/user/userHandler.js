@@ -11,7 +11,7 @@ const db = require("../../models");
  * @path /api/v1/users
  * @query
  * - username: string (Optional)
- * - roleId: int (Optional)
+ * - roleId: string (Optional)
  * - offset: int (Optional)
  * - limit: int (Optional)
  * @method GET

@@ -1,0 +1,19 @@
+post:
+    tags:
+        - auth
+    summary: Đăng xuất
+    responses:
+        200:
+            description: Đăng xuất thành công
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            message:
+                                type: string
+                                example: 'Đăng xuất thành công'
+        401:
+            $ref: '#/components/responses/Unauthorized'
+        500:
+            $ref: '#/components/responses/InternalServerError'

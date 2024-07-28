@@ -1,0 +1,39 @@
+BadRequest:
+    description: Yêu cầu không hợp lệ
+    content:
+        application/json:
+            schema:
+                $ref: '#/components/schemas/Error'
+            examples:
+                BadRequestError:
+                    $ref: '#/components/schemas/Error/examples/BadRequestError'
+
+Unauthorized:
+    description: Truy cập trái phép
+    content:
+        application/json:
+            schema:
+                $ref: '#/components/schemas/Error'
+            examples:
+                UnauthorizedError:
+                    $ref: '#/components/schemas/Error/examples/UnauthorizedError'
+
+Forbidden:
+    description: Không có quyền truy cập
+    content:
+        application/json:
+            schema:
+                $ref: '#/components/schemas/Error'
+            examples:
+                ForbiddenError:
+                    $ref: '#/components/schemas/Error/examples/ForbiddenError'
+
+InternalServerError:
+    description: Lỗi máy chủ
+    content:
+        application/json:
+            schema:
+                $ref: '#/components/schemas/Error'
+            examples:
+                InternalServerError:
+                    $ref: '#/components/schemas/Error/examples/InternalServerError'
