@@ -1,44 +1,43 @@
-post:
-    tags:
-        - auth
-    summary: Đăng nhập vào hệ thống
-    requestBody:
-        required: true
+tags:
+    - auth
+summary: Đăng nhập vào hệ thống
+requestBody:
+    required: true
+    content:
+        application/json:
+            schema:
+                type: object
+                properties:
+                    username:
+                        type: string
+                        example: admin
+                    password:
+                        type: string
+                        example: admin
+responses:
+    200:
+        description: Đăng nhập thành công
         content:
             application/json:
                 schema:
                     type: object
                     properties:
-                        username:
+                        data:
+                            $ref: '#/components/schemas/Tokens'
+                        message:
                             type: string
-                            example: admin
-                        password:
-                            type: string
-                            example: admin
-    responses:
-        200:
-            description: Đăng nhập thành công
-            content:
-                application/json:
-                    schema:
-                        type: object
-                        properties:
-                            data:
-                                $ref: '#/components/schemas/Tokens'
-                            message:
-                                type: string
-                                example: Đăng nhập thành công
-        400:
-            $ref: '#/components/responses/BadRequest'
-        401:
-            description: Tên đăng nhập hoặc mật khẩu không chính xác
-            content:
-                application/json:
-                    schema:
-                        $ref: '#/components/schemas/Error'
-                    examples:
-                        WrongUsernameOrPassword:
-                            value:
-                                message: Tên đăng nhập hoặc mật khẩu không chính xác
-        500:
-            $ref: '#/components/responses/InternalServerError'
+                            example: Đăng nhập thành công
+    400:
+        $ref: '#/components/responses/BadRequest'
+    401:
+        description: Tên đăng nhập hoặc mật khẩu không chính xác
+        content:
+            application/json:
+                schema:
+                    $ref: '#/components/schemas/Error'
+                examples:
+                    WrongUsernameOrPassword:
+                        value:
+                            message: Tên đăng nhập hoặc mật khẩu không chính xác
+    500:
+        $ref: '#/components/responses/InternalServerError'

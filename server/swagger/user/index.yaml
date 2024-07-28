@@ -1,56 +1,55 @@
-get:
-    tags:
-        - user
-    summary: Lấy danh sách tài khoản
-    parameters:
-        - $ref: '#/components/parameters/Authorization'
-        - in: query
-          name: username
-          schema: 
+tags:
+    - user
+summary: Lấy danh sách tài khoản
+parameters:
+    - $ref: '#/components/parameters/Authorization'
+    -   in: query
+        name: username
+        schema: 
             type: string
             example: admin
-            description: Tên tài khoản cần tìm kiếm (tương đối)
-        - in: query
-          name: roleId
-          schema: 
+        description: Tên tài khoản cần tìm kiếm (tương đối)
+    -   in: query
+        name: roleId
+        schema: 
             type: string
             example: admin
-            description: Vai trò của tài khoản cần tìm kiếm
-        - in: query
-          name: offset
-          schema: 
+        description: Vai trò của tài khoản cần tìm kiếm
+    -   in: query
+        name: offset
+        schema: 
             type: integer
             example: 1
             minimum: 0
-            description: Vị trí bắt đầu lấy tài khoản
-        - in: query
-          name: limit
-          schema: 
+        description: Vị trí bắt đầu lấy tài khoản
+    -   in: query
+        name: limit
+        schema: 
             type: integer
             example: 10
             minimum: 0
-            description: Số lượng tài khoản cần lấy
-    responses:
-        200:
-            description: Lấy danh sách tài khoản thành công
-            content:
-                application/json:
-                    schema:
-                        type: object
-                        properties:
-                            users:
-                                $ref: '#/components/schemas/ListUser'
-                            total:
-                                type: integer
-                                example: 100
-                            message:
-                                type: string
-                                example: Lấy danh sách tài khoản thành công
-        400:
-            $ref: '#/components/responses/BadRequest'
-        401:
-            $ref: '#/components/responses/Unauthorized'
-        403:
-            $ref: '#/components/responses/Forbidden'
-        500:
-            $ref: '#/components/responses/InternalServerError'
+        description: Số lượng tài khoản cần lấy
+responses:
+    200:
+        description: Lấy danh sách tài khoản thành công
+        content:
+            application/json:
+                schema:
+                    type: object
+                    properties:
+                        users:
+                            $ref: '#/components/schemas/ListUser'
+                        total:
+                            type: integer
+                            example: 100
+                        message:
+                            type: string
+                            example: Lấy danh sách tài khoản thành công
+    400:
+        $ref: '#/components/responses/BadRequest'
+    401:
+        $ref: '#/components/responses/Unauthorized'
+    403:
+        $ref: '#/components/responses/Forbidden'
+    500:
+        $ref: '#/components/responses/InternalServerError'

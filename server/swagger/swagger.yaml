@@ -23,19 +23,24 @@ tags:
 
 paths:
     /auth/me:
-        $ref: './swagger/auth/me.yaml'
+        get:
+            $ref: './swagger/auth/me.yaml'
 
     /auth/login:
-        $ref: './swagger/auth/login.yaml'
+        post:
+            $ref: './swagger/auth/login.yaml'
 
     /auth/refresh_tokens:
-        $ref: './swagger/auth/refresh_tokens.yaml'
+        post:
+            $ref: './swagger/auth/refresh_tokens.yaml'
 
     /auth/logout:
-        $ref: './swagger/auth/logout.yaml'
+        post:
+            $ref: './swagger/auth/logout.yaml'
 
     /users:
-        $ref: './swagger/user/index.yaml'
+        get:
+            $ref: './swagger/user/index.yaml'
 
     /users/{username}:
         post:
