@@ -20,6 +20,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
+// Config swagger
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./swagger");
+swaggerDocument().then((swaggerSpec) => {
+    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+});
+
 // ------------ Register router ------------
 const authMiddleware = require("./src/auth/authMiddleware");
 

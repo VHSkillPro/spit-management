@@ -1,0 +1,33 @@
+get:
+    tags: 
+        - auth
+    summary: Lấy thông tin của phiên đăng nhập hiện tại
+    parameters:
+        - $ref: '#/components/parameters/Authorization'
+    responses:
+        200:
+            description: Lấy thông tin người dùng thành công
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            data:
+                                type: object
+                                properties:
+                                    user:
+                                        type: object
+                                        properties:
+                                            username:
+                                                type: string
+                                                example: admin
+                                            role:
+                                                type: string
+                                                example: admin
+                            message:
+                                type: string
+                                example: Lấy thông tin người dùng thành công
+        401:
+            $ref: '#/components/responses/Unauthorized'
+        500:
+            $ref: '#/components/responses/InternalServerError'
