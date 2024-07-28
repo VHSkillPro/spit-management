@@ -23,6 +23,9 @@ Error:
         ForbiddenError:
             value:
                 message: Không có quyền truy cập
+        NotFound:
+            value:
+                message: Không tìm thấy tài nguyên
         InternalServerError:
             value:
                 message: Lỗi máy chủ
@@ -30,7 +33,21 @@ Error:
 ListUser:
     type: array
     items:
-        -$ref: '#/components/schemas/User'
+        $ref: '#/components/schemas/User'
+    example:
+        - username: admin
+          password: $2b$10$bFOMxEyidWvQoy5.gmTcMezzH805sO9CJf706wCVUB24m/a2ECiNO
+          roleId: admin
+          refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzIxMjM2NDkwLCJleHAiOjE3MjEzMjI4OTB9.Vqdls-RFj2IAnjvuMnDWoUFKvPKl0haokK7WLOi1slE
+          createAt: "2024-07-25T16:57:34.000Z"
+          updateAt: "2024-07-26T15:03:54.000Z"
+        - username: member
+          password: $2b$10$bFOMxEyidWvQoy5.gmTcMezzH805sO9CJf706wCVUB24m/a2ECiNO
+          roleId: member
+          refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzIxMjM2NDkwLCJleHAiOjE3MjEzMjI4OTB9.Vqdls-RFj2IAnjvuMnDWoUFKvPKl0haokK7WLOi1slE
+          createAt: "2024-07-25T16:57:34.000Z"
+          updateAt: "2024-07-26T15:03:54.000Z"
+          
 
 User:
     type: object
@@ -47,22 +64,10 @@ User:
             type: string
         updateAt:
             type: string
-    examples:
-        default:
-            value:
-                password: $2b$10$bFOMxEyidWvQoy5.gmTcMezzH805sO9CJf706wCVUB24m/a2ECiNO
-                refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzIxMjM2NDkwLCJleHAiOjE3MjEzMjI4OTB9.Vqdls-RFj2IAnjvuMnDWoUFKvPKl0haokK7WLOi1slE
-                createAt: "2024-07-25T16:57:34.000Z"
-                updateAt: "2024-07-26T15:03:54.000Z"
-        admin:
-            allOf:
-                - $ref: '#/components/schemas/User/examples/default'    
-                - value:  
-                    username: admin
-                    roleId: admin
-        member:
-            allOf:
-                - $ref: '#/components/schemas/User/examples/default'    
-                - value:  
-                    username: member
-                    roleId: member
+    example:
+        username: admin
+        password: $2b$10$bFOMxEyidWvQoy5.gmTcMezzH805sO9CJf706wCVUB24m/a2ECiNO
+        roleId: admin
+        refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzIxMjM2NDkwLCJleHAiOjE3MjEzMjI4OTB9.Vqdls-RFj2IAnjvuMnDWoUFKvPKl0haokK7WLOi1slE
+        createAt: "2024-07-25T16:57:34.000Z"
+        updateAt: "2024-07-26T15:03:54.000Z"
