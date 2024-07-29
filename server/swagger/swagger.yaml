@@ -23,222 +23,38 @@ tags:
 
 paths:
     /auth/me:
-        $ref: './swagger/auth/me.yaml'
+        get:
+            $ref: './swagger/auth/me.yaml'
 
     /auth/login:
-        $ref: './swagger/auth/login.yaml'
+        post:
+            $ref: './swagger/auth/login.yaml'
 
     /auth/refresh_tokens:
-        $ref: './swagger/auth/refresh_tokens.yaml'
+        post:
+            $ref: './swagger/auth/refresh_tokens.yaml'
 
     /auth/logout:
-        $ref: './swagger/auth/logout.yaml'
+        post:
+            $ref: './swagger/auth/logout.yaml'
 
-    # /users:
-    #     get:
-    #         tags:
-    #             - user
-    #         summary: Lấy danh sách tài khoản
-    #         parameters:
-    #             - $ref: '#/components/parameters/Authorization'
-    #             - in: query
-    #               name: username
-    #               schema: 
-    #                 type: string
-    #                 example: admin
-    #               description: Tên tài khoản cần tìm kiếm (tương đối)
-    #             - in: query
-    #               name: roleId
-    #               schema: 
-    #                 type: string
-    #                 example: admin
-    #               description: Vai trò của tài khoản cần tìm kiếm
-    #             - in: query
-    #               name: offset
-    #               schema: 
-    #                 type: integer
-    #                 example: 1
-    #                 minimum: 0
-    #               description: Vị trí bắt đầu lấy tài khoản
-    #             - in: query
-    #               name: limit
-    #               schema: 
-    #                 type: integer
-    #                 example: 10
-    #                 minimum: 0
-    #               description: Số lượng tài khoản cần lấy
-                  
-    #         responses:
-    #             200:
-    #                 description: Lấy danh sách tài khoản thành công"
-    #                 content:
-    #                     application/json:
-    #                         schema:
-    #                             type: object
-    #                             properties:
-    #                                 data:
-    #                                     $ref: '#/components/schemas/ListUser'
-    #                                 message:
-    #                                     type: string
-    #                                     example: Lấy danh sách tài khoản thành công"
-    #             401:
-    #                 $ref: '#/components/responses/Unauthorized'
-    #             500:
-    #                 $ref: '#/components/responses/InternalServer'
+    /users:
+        get:
+            $ref: './swagger/user/index.yaml'
 
-    #     post:
-    #         tags:
-    #             - user
-    #         summary: Tạo tài khoản
-    #         parameters:
-    #             - $ref: '#/components/parameters/Authorization'
-    #         requestBody:
-    #             required: true
-    #             content:
-    #                 application/json:
-    #                     schema:
-    #                         type: object
-    #                         properties:
-    #                             username:
-    #                                 type: string
-    #                                 example: admin
-    #                                 minLength: 6
-    #                                 maxLength: 255
-    #                             password:
-    #                                 type: string
-    #                                 example: admin
-    #                             repassword:
-    #                                 type: string
-    #                                 example: admin
-    #                             roleId:
-    #                                 type: string
-    #                                 example: admin
-    #         responses:
-    #             201:
-    #                 description: Tạo tài khoản thành công
-    #                 content:
-    #                     application/json:
-    #                         schema:
-    #                             type: object
-    #                             properties:
-    #                                 message:
-    #                                     type: string
-    #                                     example: Tạo tài khoản thành công
-    #             401:
-    #                 $ref: '#/components/responses/Unauthorized'
-    #             409:
-    #                 description: Tài khoản đã tồn tại
-    #                 content:
-    #                     application/json:
-    #                         schema:
-    #                             type: object
-    #                             properties:
-    #                                 message:
-    #                                     type: string
-    #                                     example: Tài khoản đã tồn tại
-    #             500:
-    #                 $ref: '#/components/responses/InternalServer'
+        post:
+            $ref: './swagger/user/create.yaml'
 
-    # /users/{username}:
-    #     get:
-    #         tags:
-    #             - user
-    #         summary: Lấy thông tin tài khoản theo tên tài khoản
-    #         parameters:
-    #             - $ref: '#/components/parameters/Authorization'
-    #             - in: path
-    #               name: username
-    #               schema: 
-    #                 type: string
-    #                 example: admin
-    #               required: true
-    #               description: Tên tài khoản cần lấy thông tin
-    #         responses:
-    #             200:
-    #                 description: Lấy thông tin tài khoản thành công
-    #                 content:
-    #                     application/json:
-    #                         schema:
-    #                             type: object
-    #                             properties:
-    #                                 data:
-    #                                     $ref: '#/components/schemas/User'
-    #                                 message:
-    #                                     type: string
-    #                                     example: Lấy thông tin tài khoản thành công
-    #             401:
-    #                 $ref: '#/components/responses/Unauthorized'
-    #             404:
-    #                 description: Không tìm thấy tài khoản
-    #                 content:
-    #                     application/json:
-    #                         schema:
-    #                             type: object
-    #                             properties:
-    #                                 message:
-    #                                     type: string
-    #                                     example: Không tìm thấy tài khoản
-    #             500:
-    #                 $ref: '#/components/responses/InternalServer'
+    /users/{username}:
+        post:
+            $ref: './swagger/user/show.yaml'
+        
+        patch:
+            $ref: './swagger/user/update.yaml'
 
-    #     delete:
-    #         tags:
-    #             - user
-    #         summary: Xóa tài khoản
-    #         parameters:
-    #             - $ref: '#/components/parameters/Authorization'
-    #             - in: path
-    #               name: username
-    #               schema: 
-    #                 type: string
-    #                 example: admin
-    #               required: true
-    #               description: Tên tài khoản cần xóa
-    #         responses:
-    #             200:
-    #                 description: Xóa tài khoản thành công
-    #                 content:
-    #                     application/json:
-    #                         schema:
-    #                             type: object
-    #                             properties:
-    #                                 message:
-    #                                     type: string
-    #                                     example: Xóa tài khoản thành công
-    #             400:
-    #                 description: Không thể xóa tài khoản root
-    #                 content:
-    #                     application/json:
-    #                         schema:
-    #                             type: object
-    #                             properties:
-    #                                 message:
-    #                                     type: string
-    #                                     example: Không thể xóa tài khoản root
-    #             401:
-    #                 $ref: '#/components/responses/Unauthorized'
-    #             403:
-    #                 description: Không thể xóa tài khoản root
-    #                 content:
-    #                     application/json:
-    #                         schema:
-    #                             type: object
-    #                             properties:
-    #                                 message:
-    #                                     type: string
-    #                                     example: Không thể xóa tài khoản root
-    #             404:
-    #                 description: Không tìm thấy tài khoản
-    #                 content:
-    #                     application/json:
-    #                         schema:
-    #                             type: object
-    #                             properties:
-    #                                 message:
-    #                                     type: string
-    #                                     example: Không tìm thấy tài khoản
-    #             500:
-    #                 $ref: '#/components/responses/InternalServer'
+        delete:
+            $ref: './swagger/user/destroy.yaml'
+
 components:
     parameters:
         $ref: './swagger/parameters.yaml'

@@ -1,0 +1,58 @@
+tags:
+    - user
+summary: Cập nhật thông tin tài khoản
+parameters:
+    -   $ref: '#/components/parameters/Authorization'
+    -   name: username
+        in: path
+        description: Tên tài khoản cần cập nhật
+        required: true
+        schema:
+            type: string
+            example: admin
+requestBody:
+    description: Thông tin tài khoản cần cập nhật
+    required: true
+    content:
+        application/json:
+            schema:
+                type: object
+                properties:
+                    password:
+                        type: string
+                        example: 123456
+                        minLength: 6
+                        maxLength: 255
+                        pattern: '^[a-zA-Z0-9@.#$!%*?&^]+$'
+                    roleId:
+                        type: string
+                        example: admin
+responses:
+    200:
+        description: Cập nhật tài khoản thành công
+        content:
+            application/json:
+                schema:
+                    type: object
+                    properties:
+                        message:
+                            type: string
+                            example: Cập nhật tài khoản thành công
+    400:
+        $ref: '#/components/responses/BadRequest'
+    401:
+        $ref: '#/components/responses/Unauthorized'
+    403:
+        $ref: '#/components/responses/Forbidden'
+    404:   
+        description: Tài khoản không tồn tại
+        content:
+            application/json:
+                schema:
+                    $ref: '#/components/schemas/Error'
+                examples:
+                    UserNotFound:
+                        value:
+                            message: Tài khoản không tồn tại
+    500:
+        $ref: '#/components/responses/InternalServerError'
