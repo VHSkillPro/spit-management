@@ -42,65 +42,18 @@ paths:
         get:
             $ref: './swagger/user/index.yaml'
 
+        post:
+            $ref: './swagger/user/create.yaml'
+
     /users/{username}:
         post:
             $ref: './swagger/user/show.yaml'
         
+        patch:
+            $ref: './swagger/user/update.yaml'
+
         delete:
             $ref: './swagger/user/destroy.yaml'
-
-    #     post:
-    #         tags:
-    #             - user
-    #         summary: Tạo tài khoản
-    #         parameters:
-    #             - $ref: '#/components/parameters/Authorization'
-    #         requestBody:
-    #             required: true
-    #             content:
-    #                 application/json:
-    #                     schema:
-    #                         type: object
-    #                         properties:
-    #                             username:
-    #                                 type: string
-    #                                 example: admin
-    #                                 minLength: 6
-    #                                 maxLength: 255
-    #                             password:
-    #                                 type: string
-    #                                 example: admin
-    #                             repassword:
-    #                                 type: string
-    #                                 example: admin
-    #                             roleId:
-    #                                 type: string
-    #                                 example: admin
-    #         responses:
-    #             201:
-    #                 description: Tạo tài khoản thành công
-    #                 content:
-    #                     application/json:
-    #                         schema:
-    #                             type: object
-    #                             properties:
-    #                                 message:
-    #                                     type: string
-    #                                     example: Tạo tài khoản thành công
-    #             401:
-    #                 $ref: '#/components/responses/Unauthorized'
-    #             409:
-    #                 description: Tài khoản đã tồn tại
-    #                 content:
-    #                     application/json:
-    #                         schema:
-    #                             type: object
-    #                             properties:
-    #                                 message:
-    #                                     type: string
-    #                                     example: Tài khoản đã tồn tại
-    #             500:
-    #                 $ref: '#/components/responses/InternalServer'
 
 components:
     parameters:
