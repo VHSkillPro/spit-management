@@ -105,9 +105,22 @@ const destroyUser = async (username) => {
     });
 };
 
+/**
+ * Lấy danh sách tài khoản theo roleId
+ * @param {string} roleId
+ * @returns {Promise<User[]>}
+ */
+const getUsersByRoleId = async (roleId) => {
+    const users = await db.User.findAll({
+        where: { roleId },
+    });
+    return users;
+};
+
 module.exports = {
     getAllUsers,
     getUserByUsername,
+    getUsersByRoleId,
     countAllUsers,
     createUser,
     destroyUser,

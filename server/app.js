@@ -32,12 +32,12 @@ const authMiddleware = require("./src/auth/authMiddleware");
 
 const authRouter = require("./src/auth/authRouter");
 const userRouter = require("./src/user/userRouter");
-// const roleRouter = require("./src/role/route");
+const roleRouter = require("./src/role/roleRouter");
 // const permissionRouter = require("./src/permission/route");
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", authMiddleware.isAuthenticated, userRouter);
-// app.use("/api/v1/roles", isAuthenticated, roleRouter);
+app.use("/api/v1/roles", authMiddleware.isAuthenticated, roleRouter);
 // app.use("/api/v1/permissions", isAuthenticated, permissionRouter);
 // ------------------------------------------
 
