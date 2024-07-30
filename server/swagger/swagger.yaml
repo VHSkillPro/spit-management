@@ -16,10 +16,14 @@ servers:
     - url: https://localhost:3000/api/v1
 
 tags:
-    - name: auth
-      description: Xác thực người dùng
-    - name: user
-      description: Quản lý tài khoản
+    -   name: auth
+        description: Xác thực người dùng
+
+    -   name: user
+        description: Quản lý tài khoản
+        
+    -   name: role
+        description: Quản lý chức vụ
 
 paths:
     /auth/me:
@@ -54,6 +58,14 @@ paths:
 
         delete:
             $ref: './swagger/user/destroy.yaml'
+
+    /roles:
+        get:    
+            $ref: './swagger/role/index.yaml'
+
+    /roles/{roleId}:
+        get:
+            $ref: './swagger/role/show.yaml'
 
 components:
     parameters:

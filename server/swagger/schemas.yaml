@@ -71,3 +71,34 @@ User:
         refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzIxMjM2NDkwLCJleHAiOjE3MjEzMjI4OTB9.Vqdls-RFj2IAnjvuMnDWoUFKvPKl0haokK7WLOi1slE
         createAt: "2024-07-25T16:57:34.000Z"
         updateAt: "2024-07-26T15:03:54.000Z"
+
+ListRole:
+    type: array
+    items:
+        $ref: '#/components/schemas/Role'
+    example:
+        - id: admin
+          name: Quản trị viên
+          createAt: "2024-07-25T16:57:34.000Z"
+          updateAt: "2024-07-26T15:03:54.000Z"
+        - id: member
+          name: Thành viên
+          createAt: "2024-07-25T16:57:34.000Z"
+          updateAt: "2024-07-26T15:03:54.000Z"
+
+Role:
+    type: object
+    properties:
+        id:
+            type: string
+        name:
+            type: string
+        createAt:
+            type: string
+        updateAt:
+            type: string
+    example:
+        id: admin
+        name: Quản trị viên
+        createAt: "2024-07-25T16:57:34.000Z"
+        updateAt: "2024-07-26T15:03:54.000Z"

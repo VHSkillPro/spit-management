@@ -51,6 +51,9 @@ const checkPermission = (permission) => {
     /**
      * @param {express.Request} req
      * @param {express.Response} res
+     * @param {object} res.user - Thông tin người dùng hiện tại
+     * @param {string} res.user.username - Username của người dùng hiện tại
+     * @param {string} res.user.roleId - Role của người dùng hiện tại
      * @param {express.NextFunction} next
      */
     return async (req, res, next) => {
