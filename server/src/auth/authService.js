@@ -1,61 +1,72 @@
-const { Op } = require("sequelize");
-const db = require("../../models");
+const knex = require("../../knex/knex");
 
 /**
- * Cập nhập refreshToken vào database
+ * @typedef {Object} User
+ * @property {string} username
+ * @property {string} password
+ * @property {string} roleId
+ * @property {string} refreshToken
+ */
+
+/**
+ * Update refresh token of user have username
  * @param {string} username
  * @param {string} refreshToken
  * @returns {Promise<void>}
  */
 const updateRefreshToken = async (username, refreshToken) => {
-    await db.sequelize.transaction(async (t) => {
-        await db.User.update(
-            { refreshToken: refreshToken },
-            {
-                where: {
-                    username: username,
-                },
-            }
-        );
+    await knex.transaction(async (trx) => {
+        await knex("Users").where({ username }).update({ refreshToken });
     });
 };
 
 /**
- * Lấy thông tin tài khoản theo username
+ * Get user by username
  * @param {string} username
- * @returns {Promise<User>} Thông tin tài khoản
+ * @returns {Promise<User>} User
  */
 const getUserByUsername = async (username) => {
-    const user = await db.User.findOne({ where: { username } });
+    const user = await knex("Users").where({ username }).first();
     return user;
 };
 
 /**
- * Kiểm tra quyền permissionId của roleId
- * @param {string} roleId
- * @param {string} permissionId
- * @returns
+ * Get user by refresh token
+ * @param {string} refreshToken
+ * @returns {Promise<User>} User
  */
-const havePermission = async (roleId, permissionId) => {
-    const count = await db.Role.count({
-        where: {
-            id: roleId,
-            [Op.or]: [
-                {
-                    "$permissions.id$": permissionId,
-                },
-                {
-                    isRoot: true,
-                },
-            ],
-        },
-        include: "permissions",
-    });
-    return count > 0;
+const getUserByRefreshToken = async (refreshToken) => {
+    const user = await knex("Users").where({ refreshToken }).first();
+    return user;
 };
+
+// /**
+//  * Kiểm tra quyền permissionId của roleId
+//  * @param {string} roleId
+//  * @param {string} permissionId
+//  * @returns
+//  */
+// const havePermission = async (roleId, permissionId) => {
+//     const count = await db.Role.count({
+//         where: {
+//             id: roleId,
+//             [Op.or]: [
+//                 {
+//                     "$permissions.id$": permissionId,
+//                 },
+//                 {
+//                     isRoot: true,
+//                 },
+//             ],
+//         },
+//         include: "permissions",
+//     });
+//     return count > 0;
+// };
 
 module.exports = {
     updateRefreshToken,
     getUserByUsername,
-    havePermission,
+    getUserByRefreshToken,
+    // havePermission,
 };

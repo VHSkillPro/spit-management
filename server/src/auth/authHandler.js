@@ -5,65 +5,10 @@ const { StatusCodes } = require("http-status-codes");
 const AppError = require("../../utils/AppError");
 const authService = require("./authService");
 const authMessage = require("./authMessage");
-const { generateAT, generateRT, verifyRT } = require("../../utils/jwt");
-const db = require("../../models");
+const jwt = require("../../utils/jwt");
 
 /**
- * API đăng nhập
- * @path /api/v1/auth/login
- * @method POST
- * @body
- * - username: string
- * - password: string
- * @param {express.Request} req
- * @param {express.Response} res
- * @param {express.NextFunction} next
- */
-const login = async (req, res, next) => {
-    try {
-        const { username, password } = req.body;
-        const user = await authService.getUserByUsername(username);
-
-        if (!user || !(await bcrypt.compare(password, user.password))) {
-            return next(
-                new AppError(StatusCodes.UNAUTHORIZED, authMessage.LOGIN_FAIL)
-            );
-        }
-
-        // Tạo ra accessToken và refreshToken
-        const payload = {
-            user: {
-                username: user.username,
-                roleId: user.roleId,
-            },
-        };
-
-        const accessToken = generateAT(payload);
-        const refreshToken = generateRT(payload);
-
-        // Cập nhập refreshToken vào database
-        await db.sequelize.transaction(async (t) => {
-            user.refreshToken = refreshToken;
-            await user.save();
-        });
-
-        return res.status(StatusCodes.OK).send({
-            data: {
-                access_token: accessToken,
-                refresh_token: refreshToken,
-            },
-            message: authMessage.LOGIN_SUCCESS,
-        });
-    } catch (error) {
-        console.log(error);
-        return next(new AppError(StatusCodes.INTERNAL_SERVER_ERROR));
-    }
-};
-
-/**
- * API lấy thông tin người dùng
- * @path /api/v1/auth/me
- * @method GET
+ * Handler get self information
  * @param {express.Request} req
  * @param {express.Response} res
  * @param {express.NextFunction} next
@@ -74,50 +19,32 @@ const me = async (req, res, next) => {
             data: {
                 user: req.user,
             },
-            message: authMessage.GET_USER_SUCCESS,
+            message: authMessage.GET_ME_SUCCESS,
         });
     } catch (error) {
-        console.log(error);
-        return next(new AppError(StatusCodes.INTERNAL_SERVER_ERROR));
+        return next(error);
     }
 };
 
 /**
- * API làm mới accessToken và refreshToken
- * @path /api/v1/auth/refresh_tokens
- * @method POST
- * @header Authorization: Bearer <refresh_token>
+ * Handler login
  * @param {express.Request} req
  * @param {express.Response} res
  * @param {express.NextFunction} next
  */
-const refreshTokens = async (req, res, next) => {
+const login = async (req, res, next) => {
     try {
-        // Lấy refreshToken đính kèm trong header
-        const authHeader = req.headers["authorization"];
-        const refreshToken = authHeader && authHeader.split(" ")[1];
+        const { username, password } = req.body;
+        const user = await authService.getUserByUsername(username);
 
-        // Kiểm tra refreshToken có tồn tại và hợp lệ không
-        const verified = refreshToken ? verifyRT(refreshToken) : false;
-        if (!refreshToken || !verified) {
+        // Check username exist and password correct
+        if (!user || !(await bcrypt.compare(password, user.password))) {
             return next(
-                new AppError(StatusCodes.UNAUTHORIZED, authMessage.UNAUTHORIZED)
+                new AppError(StatusCodes.UNAUTHORIZED, authMessage.LOGIN_FAIL)
             );
         }
 
-        // Tìm kiếm user cần cấp lại accessToken
-        const user = await db.User.findOne({
-            where: { refreshToken: refreshToken },
-        });
-
-        // Nếu không tìm thấy user
-        if (!user) {
-            return next(
-                new AppError(StatusCodes.UNAUTHORIZED, authMessage.UNAUTHORIZED)
-            );
-        }
-
-        // Tạo lại accessToken và refreshToken
+        // Generate accessToken and refreshToken
         const payload = {
             user: {
                 username: user.username,
@@ -125,16 +52,68 @@ const refreshTokens = async (req, res, next) => {
             },
         };
 
-        const newAccessToken = generateAT(payload);
-        const newRefreshToken = generateRT(payload);
+        const accessToken = jwt.generateAT(payload);
+        const refreshToken = jwt.generateRT(payload);
 
-        // Cập nhật refreshToken vào database
-        await db.sequelize.transaction(async (t) => {
-            user.refreshToken = newRefreshToken;
-            await user.save();
+        // Update refresh token
+        await authService.updateRefreshToken(username, refreshToken);
+
+        return res.status(StatusCodes.OK).send({
+            data: {
+                access_token: accessToken,
+                refresh_token: refreshToken,
+            },
+            message: authMessage.LOGIN_SUCCESS,
         });
+    } catch (error) {
+        return next(error);
+    }
+};
 
-        // Trả về thông báo làm mới token thành công
+/**
+ * Handler refresh tokens
+ * @param {express.Request} req
+ * @param {express.Response} res
+ * @param {express.NextFunction} next
+ */
+const refreshTokens = async (req, res, next) => {
+    try {
+        // Get refreshToken from header
+        const authHeader = req.headers["authorization"];
+        const refreshToken = authHeader && authHeader.split(" ")[1];
+
+        // Verify refreshToken
+        const verified = refreshToken ? jwt.verifyRT(refreshToken) : false;
+        if (!refreshToken || !verified) {
+            return next(
+                new AppError(StatusCodes.UNAUTHORIZED, authMessage.UNAUTHORIZED)
+            );
+        }
+
+        // Get user by refreshToken
+        const user = await authService.getUserByRefreshToken(refreshToken);
+
+        // Check user exist
+        if (!user) {
+            return next(
+                new AppError(StatusCodes.UNAUTHORIZED, authMessage.UNAUTHORIZED)
+            );
+        }
+
+        // Generate new accessToken and refreshToken
+        const payload = {
+            user: {
+                username: user.username,
+                roleId: user.roleId,
+            },
+        };
+
+        const newAccessToken = jwt.generateAT(payload);
+        const newRefreshToken = jwt.generateRT(payload);
+
+        // Update refresh token
+        await authService.updateRefreshToken(user.username, newRefreshToken);
+
         return res.status(StatusCodes.OK).send({
             data: {
                 access_token: newAccessToken,
@@ -143,31 +122,26 @@ const refreshTokens = async (req, res, next) => {
             message: authMessage.REFRESH_TOKEN_SUCCESS,
         });
     } catch (error) {
-        console.log(error);
-        return next(new AppError(StatusCodes.INTERNAL_SERVER_ERROR));
+        return next(error);
     }
 };
 
 /**
- * API đăng xuất
- * @path /api/v1/auth/logout
- * @method POST
+ * Handler logout
  * @param {express.Request} req
  * @param {express.Response} res
  * @param {express.NextFunction} next
  */
 const logout = async (req, res, next) => {
     try {
-        // Xoá refreshToken của người dùng hiện tại trong database
+        // Update refresh token to null
         await authService.updateRefreshToken(req.user.username, null);
 
-        // Trả về thông báo đăng xuất thành công
         return res.status(StatusCodes.OK).send({
             message: authMessage.LOGOUT_SUCCESS,
         });
     } catch (error) {
-        console.log(error);
-        return next(new AppError(StatusCodes.INTERNAL_SERVER_ERROR));
+        return next(error);
     }
 };
 
