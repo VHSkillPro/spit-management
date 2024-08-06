@@ -1,15 +1,17 @@
 const userMessage = {
-    GET_ALL_USERS_SUCCESS: "Lấy danh sách tài khoản thành công",
-    GET_USER_SUCCESS: "Lấy thông tin tài khoản thành công",
-    CREATE_USER_SUCCESS: "Tạo tài khoản thành công",
-    UPDATE_USER_SUCCESS: "Cập nhật tài khoản thành công",
-    DELETE_USER_SUCCESS: "Xóa tài khoản thành công",
+    INDEX: "Lấy danh sách người dùng thành công",
+    SHOW: "Lấy thông tin người dùng thành công",
 
-    USER_ALREADY_EXISTS: "Tài khoản đã tồn tại",
-    USER_NOT_FOUND: "Không tìm thấy tài khoản",
-    DELETE_USER_FAIL: "Xóa tài khoản thất bại",
+    CREATE_USER_SUCCESS: "Thêm người dùng thành công",
+    UPDATE_USER_SUCCESS: "Cập nhật thông tin người dùng thành công",
+    DELETE_USER_SUCCESS: "Xóa người dùng thành công",
+
+    USER_ALREADY_EXISTS: "Người dùng đã tồn tại",
+    USER_NOT_FOUND: "Không tìm thấy người dùng",
+    DELETE_USER_FAIL: "Xóa người dùng thất bại",
+
     CANNOT_DELETE_YOURSELF: "Không thể xóa chính bạn",
-    CANNOT_DELETE_ROOT_USER: "Không thể xóa tài khoản root",
+    CANNOT_DELETE_ROOT_USER: "Không thể xóa root",
 };
 
 module.exports = userMessage;

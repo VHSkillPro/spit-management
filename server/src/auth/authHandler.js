@@ -4,6 +4,7 @@ const { StatusCodes } = require("http-status-codes");
 
 const AppError = require("../../utils/AppError");
 const authService = require("./authService");
+const userService = require("../user/userService");
 const authMessage = require("./authMessage");
 const jwt = require("../../utils/jwt");
 
@@ -35,7 +36,7 @@ const me = async (req, res, next) => {
 const login = async (req, res, next) => {
     try {
         const { username, password } = req.body;
-        const user = await authService.getUserByUsername(username);
+        const user = await userService.getUserByUsername(username);
 
         // Check username exist and password correct
         if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -56,7 +57,7 @@ const login = async (req, res, next) => {
         const refreshToken = jwt.generateRT(payload);
 
         // Update refresh token
-        await authService.updateRefreshToken(username, refreshToken);
+        await userService.updateRefreshToken(username, refreshToken);
 
         return res.status(StatusCodes.OK).send({
             data: {
@@ -91,7 +92,7 @@ const refreshTokens = async (req, res, next) => {
         }
 
         // Get user by refreshToken
-        const user = await authService.getUserByRefreshToken(refreshToken);
+        const user = await userService.getUserByRefreshToken(refreshToken);
 
         // Check user exist
         if (!user) {
@@ -112,7 +113,7 @@ const refreshTokens = async (req, res, next) => {
         const newRefreshToken = jwt.generateRT(payload);
 
         // Update refresh token
-        await authService.updateRefreshToken(user.username, newRefreshToken);
+        await userService.updateRefreshToken(user.username, newRefreshToken);
 
         return res.status(StatusCodes.OK).send({
             data: {
@@ -135,7 +136,7 @@ const refreshTokens = async (req, res, next) => {
 const logout = async (req, res, next) => {
     try {
         // Update refresh token to null
-        await authService.updateRefreshToken(req.user.username, null);
+        await userService.updateRefreshToken(req.user.username, null);
 
         return res.status(StatusCodes.OK).send({
             message: authMessage.LOGOUT_SUCCESS,

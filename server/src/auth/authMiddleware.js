@@ -39,29 +39,26 @@ const isAuthenticated = async (req, res, next) => {
         // Đưa request tới tác vụ tiếp theo
         return next();
     } catch (error) {
-        return next(new AppError(StatusCodes.INTERNAL_SERVER_ERROR));
+        return next(error);
     }
 };
 
 /**
- * Middleware kiểm tra quyền truy cập
- * @param permission - Quyền truy cập cần kiểm tra
+ * Middleware check user have permission.
+ * @param permissionId
  */
-const checkPermission = (permission) => {
+const checkPermission = (permissionId) => {
     /**
      * @param {express.Request} req
      * @param {express.Response} res
-     * @param {object} res.user - Thông tin người dùng hiện tại
-     * @param {string} res.user.username - Username của người dùng hiện tại
-     * @param {string} res.user.roleId - Role của người dùng hiện tại
      * @param {express.NextFunction} next
      */
     return async (req, res, next) => {
         try {
-            // Kiểm tra quyền truy cập
+            // Kiểm tra xem user có quyền permissionId không
             const valid = await authService.havePermission(
                 req.user.roleId,
-                permission
+                permissionId
             );
 
             if (!valid) {
@@ -72,8 +69,7 @@ const checkPermission = (permission) => {
 
             return next();
         } catch (error) {
-            console.log(error);
-            return next(new AppError(StatusCodes.INTERNAL_SERVER_ERROR));
+            return next(error);
         }
     };
 };
