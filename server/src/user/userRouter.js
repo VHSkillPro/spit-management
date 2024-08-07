@@ -19,24 +19,27 @@ router.get(
     userHandler.show
 );
 
-// router.post(
-//     "/",
-//     authMiddleware.checkPermission("user.create"),
-//     userValidator.validateCreateUser,
-//     userHandler.create
-// );
+router.post(
+    "/",
+    authMiddleware.isAuthenticated,
+    authMiddleware.checkPermission("user.create"),
+    userValidator.validateCreateUser,
+    userHandler.create
+);
 
-// router.patch(
-//     "/:username",
-//     authMiddleware.checkPermission("user.update"),
-//     userValidator.validateUpdateUser,
-//     userHandler.update
-// );
+router.patch(
+    "/:username",
+    authMiddleware.isAuthenticated,
+    authMiddleware.checkPermission("user.update"),
+    userValidator.validateUpdateUser,
+    userHandler.update
+);
 
-// router.delete(
-//     "/:username",
-//     authMiddleware.checkPermission("user.destroy"),
-//     userHandler.destroy
-// );
+router.delete(
+    "/:username",
+    authMiddleware.isAuthenticated,
+    authMiddleware.checkPermission("user.destroy"),
+    userHandler.destroy
+);
 
 module.exports = router;

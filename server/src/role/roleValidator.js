@@ -1,5 +1,5 @@
 const { body, param } = require("express-validator");
-const { validationResult } = require("../../validators");
+const { validationResult } = require("../../utils/validators");
 
 const validateCreateRole = [
     body("id").notEmpty(),

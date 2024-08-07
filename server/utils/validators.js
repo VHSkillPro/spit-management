@@ -1,6 +1,6 @@
 const expressValidator = require("express-validator");
 const { StatusCodes } = require("http-status-codes");
-const AppError = require("../utils/AppError");
+const AppError = require("./AppError");
 
 const validationResult = async (req, res, next) => {
     const errors = expressValidator.validationResult(req);

@@ -1,4 +1,5 @@
 const knex = require("../../knex/knex");
+const bcrypt = require("bcrypt");
 
 /**
  * @typedef {Object} User
@@ -6,8 +7,8 @@ const knex = require("../../knex/knex");
  * @property {string} password
  * @property {string} roleId
  * @property {string} refreshToken
- * @property {string} createdAt
- * @property {string} updatedAt
+ * @property {Date} createdAt
+ * @property {Date} updatedAt
  */
 
 /**
@@ -112,43 +113,51 @@ const updateRefreshToken = async (username, refreshToken) => {
     });
 };
 
-// /**
-//  * Tạo tài khoản mới
-//  * @param {object} user - Thông tin tài khoản mới
-//  * - username: string
-//  * - password: string
-//  * - roleId: int
-//  * - refreshToken: string
-//  * @returns {Promise<void>}
-//  */
-// const createUser = async (user) => {
-//     await db.sequelize.transaction(async (t) => {
-//         await db.User.create(user);
-//     });
-// };
+/**
+ * Create a new user
+ * @param {object} user
+ * @param {string} user.username
+ * @param {string} user.password
+ * @param {string} user.roleId
+ * @returns {Promise<void>}
+ */
+const createUser = async (user) => {
+    await knex.transaction(async (trx) => {
+        const saltRounds = 10;
+        user.password = bcrypt.hashSync(user.password, saltRounds);
 
-// /**
-//  * Xóa tài khoản
-//  * @param {string} username
-//  * @returns {Promise<void>}
-//  */
-// const destroyUser = async (username) => {
-//     await db.sequelize.transaction(async (t) => {
-//         await db.User.destroy({ where: { username } });
-//     });
-// };
+        await knex("Users").insert(user);
+    });
+};
 
-// /**
-//  * Lấy danh sách tài khoản theo roleId
-//  * @param {string} roleId
-//  * @returns {Promise<User[]>}
-//  */
-// const getUsersByRoleId = async (roleId) => {
-//     const users = await db.User.findAll({
-//         where: { roleId },
-//     });
-//     return users;
-// };
+/**
+ * Update a user by username
+ * @param {string} username
+ * @param {object} data
+ * @param {string} [data.password]
+ * @param {string} [data.roleId]
+ */
+const updateUser = async (username, data) => {
+    await knex.transaction(async (trx) => {
+        if (data?.password) {
+            const saltRounds = 10;
+            data.password = bcrypt.hashSync(data.password, saltRounds);
+        }
+
+        await knex("Users").where({ username }).update(data);
+    });
+};
+
+/**
+ * Delete a user by username
+ * @param {string} username
+ * @returns {Promise<void>}
+ */
+const destroyUser = async (username) => {
+    await knex.transaction(async (trx) => {
+        await knex("Users").where({ username }).del();
+    });
+};
 
 module.exports = {
     countAllUsers,
@@ -160,9 +169,10 @@ module.exports = {
     getUserByUsername,
     getUserByRefreshToken,
 
+    createUser,
+
+    updateUser,
     updateRefreshToken,
-    // getUsersByRoleId,
-    // countAllUsers,
-    // createUser,
-    // destroyUser,
+
+    destroyUser,
 };

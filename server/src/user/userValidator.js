@@ -1,5 +1,5 @@
 const { body, query, param } = require("express-validator");
-const { validationResult } = require("../../validators");
+const { validationResult } = require("../../utils/validators");
 const roleService = require("../role/roleService");
 
 const validateFilterUser = [

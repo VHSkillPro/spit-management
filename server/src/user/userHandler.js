@@ -1,5 +1,6 @@
 const express = require("express");
 const userService = require("./userService");
+const roleService = require("../role/roleService");
 const userMessage = require("./userMessage");
 const AppError = require("../../utils/AppError");
 const { StatusCodes } = require("http-status-codes");
@@ -55,165 +56,128 @@ const show = async (req, res, next) => {
     }
 };
 
-// /**
-//  * API thêm một user mới vào hệ thông
-//  * @path /api/v1/users
-//  * @method POST
-//  * @body
-//  * - username: string
-//  * - password: string
-//  * - roleId: string
-//  * @param {express.Request} req
-//  * @param {express.Response} res
-//  * @param {express.NextFunction} next
-//  */
-// const create = async (req, res, next) => {
-//     try {
-//         // Kiểm tra username đã tồn tại
-//         const { username, password, roleId } = req.body;
-//         const user = await userService.getUserByUsername(username);
+/**
+ * Handler create new user
+ * @param {express.Request} req
+ * @param {express.Response} res
+ * @param {express.NextFunction} next
+ */
+const create = async (req, res, next) => {
+    try {
+        const { username, password, roleId } = req.body;
+        const user = await userService.getUserByUsername(username);
 
-//         if (user) {
-//             return next(
-//                 new AppError(
-//                     StatusCodes.CONFLICT,
-//                     userMessage.USER_ALREADY_EXISTS
-//                 )
-//             );
-//         }
+        // Check if user existed
+        if (user) {
+            return next(
+                new AppError(StatusCodes.CONFLICT, userMessage.USER_EXISTED)
+            );
+        }
 
-//         // Mã hoá mật khẩu
-//         const saltRounds = 10;
-//         const hashPassword = bcrypt.hashSync(password, saltRounds);
+        // Create new user
+        await userService.createUser({
+            username: username,
+            password: password,
+            roleId: roleId,
+        });
 
-//         // Thêm user mới vào database
-//         await userService.createUser({
-//             username: username,
-//             password: hashPassword,
-//             roleId: roleId,
-//             refreshToken: null,
-//         });
+        return res.status(StatusCodes.CREATED).send({
+            message: userMessage.CREATE,
+        });
+    } catch (error) {
+        return next(error);
+    }
+};
 
-//         // Đăng ký thành công, trả về thông báo
-//         return res.status(StatusCodes.CREATED).send({
-//             message: userMessage.CREATE_USER_SUCCESS,
-//         });
-//     } catch (error) {
-//         console.log(error);
-//         return next(new AppError(StatusCodes.INTERNAL_SERVER_ERROR));
-//     }
-// };
+/**
+ * Handler update password and roleId of user
+ * @param {express.Request} req
+ * @param {express.Response} res
+ * @param {express.NextFunction} next
+ */
+const update = async (req, res, next) => {
+    try {
+        const username = req.params.username;
+        const user = await userService.getUserByUsername(username);
 
-// /**
-//  * API cập nhật thông tin user
-//  * @path /api/v1/users/:username
-//  * @method PATCH
-//  * @body
-//  * - password: string (Optional)
-//  * - roleId: string (Optional)
-//  * @param {express.Request} req
-//  * @param {express.Response} res
-//  * @param {express.NextFunction} next
-//  */
-// const update = async (req, res, next) => {
-//     try {
-//         const username = req.params.username;
-//         const user = await userService.getUserByUsername(username);
+        // User không tồn tại
+        if (!user) {
+            return next(
+                new AppError(StatusCodes.NOT_FOUND, userMessage.USER_NOT_FOUND)
+            );
+        }
 
-//         // User không tồn tại
-//         if (!user) {
-//             return next(
-//                 new AppError(StatusCodes.NOT_FOUND, userMessage.USER_NOT_FOUND)
-//             );
-//         }
+        // Update user
+        const { password, roleId } = req.body;
+        await userService.updateUser(username, {
+            password,
+            roleId,
+        });
 
-//         // Nếu có mật khẩu mới
-//         if (req.body.password) {
-//             const saltRounds = 10;
-//             const hashPassword = bcrypt.hashSync(req.body.password, saltRounds);
-//             user.password = hashPassword;
-//         }
+        return res.status(StatusCodes.OK).send({
+            message: userMessage.UPDATE,
+        });
+    } catch (error) {
+        return next(error);
+    }
+};
 
-//         // Nếu có roleId mới
-//         if (req.body.roleId) {
-//             user.roleId = req.body.roleId;
-//         }
+/**
+ * Handler delete user
+ * @param {express.Request} req
+ * @param {express.Response} res
+ * @param {express.NextFunction} next
+ */
+const destroy = async (req, res, next) => {
+    try {
+        const username = req.params.username;
 
-//         // Cập nhật vào database
-//         await db.sequelize.transaction(async (t) => {
-//             await user.save();
-//         });
+        // Can't delete yourself
+        if (username == req.user.username) {
+            return next(
+                new AppError(
+                    StatusCodes.BAD_REQUEST,
+                    userMessage.CANNOT_DELETE_YOURSELF
+                )
+            );
+        }
 
-//         // Trả về thông báo xoá thành công
-//         return res.status(StatusCodes.OK).send({
-//             message: userMessage.UPDATE_USER_SUCCESS,
-//         });
-//     } catch (error) {
-//         console.log(error);
-//         return next(new AppError(StatusCodes.INTERNAL_SERVER_ERROR));
-//     }
-// };
+        // Check if user is not existed
+        const user = await userService.getUserByUsername(username);
 
-// /**
-//  * API xóa một user khỏi hệ thống
-//  * @path /api/v1/users/:username
-//  * @method DELETE
-//  * @param {express.Request} req
-//  * @param {express.Response} res
-//  * @param {express.NextFunction} next
-//  */
-// const destroy = async (req, res, next) => {
-//     try {
-//         const username = req.params.username;
+        if (!user) {
+            return next(
+                new AppError(StatusCodes.NOT_FOUND, userMessage.USER_NOT_FOUND)
+            );
+        }
 
-//         // Không thể xóa chính mình
-//         if (username == req.user.username) {
-//             return next(
-//                 new AppError(
-//                     StatusCodes.BAD_REQUEST,
-//                     userMessage.CANNOT_DELETE_YOURSELF
-//                 )
-//             );
-//         }
+        // Check if user have role is root
+        const role = await roleService.getRoleById(user.roleId);
 
-//         // Tìm user theo username
-//         const user = await userService.getUserByUsername(username);
+        if (role.isRoot) {
+            return next(
+                new AppError(
+                    StatusCodes.FORBIDDEN,
+                    userMessage.CANNOT_DELETE_ROOT_USER
+                )
+            );
+        }
 
-//         // Không tìm thấy user
-//         if (!user) {
-//             return next(
-//                 new AppError(StatusCodes.NOT_FOUND, userMessage.USER_NOT_FOUND)
-//             );
-//         }
+        // Delete user
+        await userService.destroyUser(username);
 
-//         // Không thể xóa root user
-//         if (user.role.isRoot) {
-//             return next(
-//                 new AppError(
-//                     StatusCodes.FORBIDDEN,
-//                     userMessage.CANNOT_DELETE_ROOT_USER
-//                 )
-//             );
-//         }
-
-//         // Xóa user
-//         await db.sequelize.transaction(async (t) => {
-//             await user.destroy();
-//         });
-
-//         return res.status(StatusCodes.OK).send({
-//             message: userMessage.DELETE_USER_SUCCESS,
-//         });
-//     } catch (error) {
-//         console.log(error);
-//         return next(new AppError(StatusCodes.INTERNAL_SERVER_ERROR));
-//     }
-// };
+        return res.status(StatusCodes.OK).send({
+            message: userMessage.DESTROY,
+        });
+    } catch (error) {
+        return next(error);
+    }
+};
 
 module.exports = {
     index,
     show,
-    // create,
-    // update,
-    // destroy,
+    create,
+    update,
+    destroy,
 };
