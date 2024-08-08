@@ -15,6 +15,24 @@ const getAllPermissions = async () => {
     return permissions;
 };
 
+/**
+ * Get list of permissions of a role
+ * @param {string} roleId
+ * @returns {Promise<Permission[]>} List of permissions
+ */
+const getPermissionsOfRole = async (roleId) => {
+    const permissions = await knex("Permissions")
+        .join(
+            "Roles_Permissions",
+            "Permissions.id",
+            "Roles_Permissions.permissionId"
+        )
+        .where("Roles_Permissions.roleId", roleId)
+        .select("Permissions.*");
+    return permissions;
+};
+
 module.exports = {
     getAllPermissions,
+    getPermissionsOfRole,
 };

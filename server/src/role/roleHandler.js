@@ -3,6 +3,7 @@ const { StatusCodes } = require("http-status-codes");
 const roleService = require("./roleService");
 const roleMessage = require("./roleMessage");
 const userServices = require("../user/userService");
+const permissionService = require("../permission/permissionService");
 const AppError = require("../../utils/AppError");
 
 /**
@@ -44,9 +45,13 @@ const show = async (req, res, next) => {
             );
         }
 
+        const permissions = await permissionService.getPermissionsOfRole(
+            roleId
+        );
+
         return res.status(StatusCodes.OK).send({
             data: {
-                role: role,
+                role: { ...role, permissions },
             },
             message: roleMessage.SHOW,
         });

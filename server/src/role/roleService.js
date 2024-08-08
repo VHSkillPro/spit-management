@@ -85,30 +85,10 @@ const destroyRole = async (roleId) => {
     });
 };
 
-// /**
-//  * Lấy danh sách permission của role
-//  * @param {string} roleId
-//  * @returns {Promise<Permission[]> | undefined}
-//  */
-// const getPermissionsOfRole = async (roleId) => {
-//     const role = await db.Role.findOne({
-//         where: { id: roleId },
-//         include: "permissions",
-//     });
-
-//     // Nếu role là root thì trả về tất cả permission
-//     if (role.isRoot) {
-//         return await db.Permission.findAll();
-//     }
-
-//     return role?.permissions;
-// };
-
 module.exports = {
     getAllRoles,
     getRoleById,
     createRole,
     updateRole,
     destroyRole,
-    // getPermissionsOfRole,
 };
