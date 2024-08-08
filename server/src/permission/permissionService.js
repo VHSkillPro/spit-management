@@ -32,7 +32,18 @@ const getPermissionsOfRole = async (roleId) => {
     return permissions;
 };
 
+/**
+ * Get permission by id
+ * @param {string} id - Permission id
+ * @returns {Promise<Permission>} Permission
+ */
+const getPermissionById = async (id) => {
+    const permission = await knex("Permissions").where({ id }).first();
+    return permission;
+};
+
 module.exports = {
     getAllPermissions,
     getPermissionsOfRole,
+    getPermissionById,
 };
