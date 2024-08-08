@@ -54,7 +54,7 @@ exports.up = async function (knex) {
                 table.string("username").primary();
                 table.string("password").notNullable();
                 table.string("roleId").notNullable();
-                table.string("refreshToken");
+                table.string("refreshToken").unique();
                 table.timestamp("createdAt").defaultTo(knex.fn.now());
                 table
                     .dateTime("updatedAt")
