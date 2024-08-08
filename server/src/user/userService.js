@@ -142,9 +142,17 @@ const updateUser = async (username, data) => {
         if (data?.password) {
             const saltRounds = 10;
             data.password = bcrypt.hashSync(data.password, saltRounds);
+        } else {
+            delete data.password;
         }
 
-        await knex("Users").where({ username }).update(data);
+        if (data?.roleId === undefined) {
+            delete data.roleId;
+        }
+
+        if (Object.keys(data).length > 0) {
+            await knex("Users").where({ username }).update(data);
+        }
     });
 };
 

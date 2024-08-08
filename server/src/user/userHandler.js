@@ -109,6 +109,7 @@ const update = async (req, res, next) => {
 
         // Update user
         const { password, roleId } = req.body;
+
         await userService.updateUser(username, {
             password,
             roleId,

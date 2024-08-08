@@ -28,17 +28,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-// // ------------ Register router ------------
-const authRouter = require("./src/auth/authRouter");
-const userRouter = require("./src/user/userRouter");
-// const roleRouter = require("./src/role/roleRouter");
-// // const permissionRouter = require("./src/permission/route");
-
-app.use("/api/v1/auth", authRouter);
-app.use("/api/v1/users", userRouter);
-// app.use("/api/v1/roles", authMiddleware.isAuthenticated, roleRouter);
-// // app.use("/api/v1/permissions", isAuthenticated, permissionRouter);
-// // ------------------------------------------
+// Define all routers
+require("./src/route")(app);
 
 // Handle error
 const AppError = require("./utils/AppError");
