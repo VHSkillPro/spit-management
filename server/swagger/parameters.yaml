@@ -1,9 +1,0 @@
-Authorization:
-    in: header
-    name: Authorization
-    required: true
-    schema:
-        type: string
-        format: JWT
-        example: Bearer {access_token}
-    description: Chuỗi token xác thực người dùng

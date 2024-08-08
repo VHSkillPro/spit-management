@@ -1,52 +1,43 @@
 const express = require("express");
 const userService = require("./userService");
+const roleService = require("../role/roleService");
 const userMessage = require("./userMessage");
 const AppError = require("../../utils/AppError");
 const { StatusCodes } = require("http-status-codes");
 const bcrypt = require("bcrypt");
-const db = require("../../models");
 
 /**
- * API lấy danh sách tài khoản
- * @path /api/v1/users
- * @query
- * - username: string (Optional)
- * - roleId: string (Optional)
- * - offset: int (Optional)
- * - limit: int (Optional)
- * @method GET
+ * Hander get list of all users
  * @param {express.Request} req
  * @param {express.Response} res
  * @param {express.NextFunction} next
  */
 const index = async (req, res, next) => {
     try {
-        const users = await userService.getAllUsers(req.query);
+        const users = await userService.getFilteredUsers(req.query);
 
         return res.status(StatusCodes.OK).send({
             data: {
                 users: users,
-                total: await userService.countAllUsers(req.query),
+                total: await userService.countFilteredUsers(req.query),
             },
-            message: userMessage.GET_ALL_USERS_SUCCESS,
+            message: userMessage.INDEX,
         });
     } catch (error) {
-        console.log(error);
-        return next(new AppError(StatusCodes.INTERNAL_SERVER_ERROR));
+        return next(error);
     }
 };
 
 /**
- * API lấy thông tin user theo username
- * @path /api/v1/users/:username
- * @method GET
+ * Handler get user by username
  * @param {express.Request} req
  * @param {express.Response} res
  * @param {express.NextFunction} next
  */
 const show = async (req, res, next) => {
     try {
-        const user = await userService.getUserByUsername(req.params.username);
+        const username = req.params.username;
+        const user = await userService.getUserByUsername(username);
 
         if (!user) {
             return next(
@@ -58,70 +49,48 @@ const show = async (req, res, next) => {
             data: {
                 user: user,
             },
-            message: userMessage.GET_USER_SUCCESS,
+            message: userMessage.SHOW,
         });
     } catch (error) {
-        console.log(error);
-        return next(new AppError(StatusCodes.INTERNAL_SERVER_ERROR));
+        return next(error);
     }
 };
 
 /**
- * API thêm một user mới vào hệ thông
- * @path /api/v1/users
- * @method POST
- * @body
- * - username: string
- * - password: string
- * - roleId: string
+ * Handler create new user
  * @param {express.Request} req
  * @param {express.Response} res
  * @param {express.NextFunction} next
  */
 const create = async (req, res, next) => {
     try {
-        // Kiểm tra username đã tồn tại
         const { username, password, roleId } = req.body;
         const user = await userService.getUserByUsername(username);
 
+        // Check if user existed
         if (user) {
             return next(
-                new AppError(
-                    StatusCodes.CONFLICT,
-                    userMessage.USER_ALREADY_EXISTS
-                )
+                new AppError(StatusCodes.CONFLICT, userMessage.USER_EXISTED)
             );
         }
 
-        // Mã hoá mật khẩu
-        const saltRounds = 10;
-        const hashPassword = bcrypt.hashSync(password, saltRounds);
-
-        // Thêm user mới vào database
+        // Create new user
         await userService.createUser({
             username: username,
-            password: hashPassword,
+            password: password,
             roleId: roleId,
-            refreshToken: null,
         });
 
-        // Đăng ký thành công, trả về thông báo
         return res.status(StatusCodes.CREATED).send({
-            message: userMessage.CREATE_USER_SUCCESS,
+            message: userMessage.CREATE,
         });
     } catch (error) {
-        console.log(error);
-        return next(new AppError(StatusCodes.INTERNAL_SERVER_ERROR));
+        return next(error);
     }
 };
 
 /**
- * API cập nhật thông tin user
- * @path /api/v1/users/:username
- * @method PATCH
- * @body
- * - password: string (Optional)
- * - roleId: string (Optional)
+ * Handler update password and roleId of user
  * @param {express.Request} req
  * @param {express.Response} res
  * @param {express.NextFunction} next
@@ -138,37 +107,24 @@ const update = async (req, res, next) => {
             );
         }
 
-        // Nếu có mật khẩu mới
-        if (req.body.password) {
-            const saltRounds = 10;
-            const hashPassword = bcrypt.hashSync(req.body.password, saltRounds);
-            user.password = hashPassword;
-        }
+        // Update user
+        const { password, roleId } = req.body;
 
-        // Nếu có roleId mới
-        if (req.body.roleId) {
-            user.roleId = req.body.roleId;
-        }
-
-        // Cập nhật vào database
-        await db.sequelize.transaction(async (t) => {
-            await user.save();
+        await userService.updateUser(username, {
+            password,
+            roleId,
         });
 
-        // Trả về thông báo xoá thành công
         return res.status(StatusCodes.OK).send({
-            message: userMessage.UPDATE_USER_SUCCESS,
+            message: userMessage.UPDATE,
         });
     } catch (error) {
-        console.log(error);
-        return next(new AppError(StatusCodes.INTERNAL_SERVER_ERROR));
+        return next(error);
     }
 };
 
 /**
- * API xóa một user khỏi hệ thống
- * @path /api/v1/users/:username
- * @method DELETE
+ * Handler delete user
  * @param {express.Request} req
  * @param {express.Response} res
  * @param {express.NextFunction} next
@@ -177,7 +133,7 @@ const destroy = async (req, res, next) => {
     try {
         const username = req.params.username;
 
-        // Không thể xóa chính mình
+        // Can't delete yourself
         if (username == req.user.username) {
             return next(
                 new AppError(
@@ -187,18 +143,19 @@ const destroy = async (req, res, next) => {
             );
         }
 
-        // Tìm user theo username
+        // Check if user is not existed
         const user = await userService.getUserByUsername(username);
 
-        // Không tìm thấy user
         if (!user) {
             return next(
                 new AppError(StatusCodes.NOT_FOUND, userMessage.USER_NOT_FOUND)
             );
         }
 
-        // Không thể xóa root user
-        if (user.role.isRoot) {
+        // Check if user have role is root
+        const role = await roleService.getRoleById(user.roleId);
+
+        if (role.isRoot) {
             return next(
                 new AppError(
                     StatusCodes.FORBIDDEN,
@@ -207,17 +164,14 @@ const destroy = async (req, res, next) => {
             );
         }
 
-        // Xóa user
-        await db.sequelize.transaction(async (t) => {
-            await user.destroy();
-        });
+        // Delete user
+        await userService.destroyUser(username);
 
         return res.status(StatusCodes.OK).send({
-            message: userMessage.DELETE_USER_SUCCESS,
+            message: userMessage.DESTROY,
         });
     } catch (error) {
-        console.log(error);
-        return next(new AppError(StatusCodes.INTERNAL_SERVER_ERROR));
+        return next(error);
     }
 };
 

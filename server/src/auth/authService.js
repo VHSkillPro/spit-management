@@ -1,61 +1,24 @@
-const { Op } = require("sequelize");
-const db = require("../../models");
+const knex = require("../../knex/knex");
 
 /**
- * Cập nhập refreshToken vào database
- * @param {string} username
- * @param {string} refreshToken
- * @returns {Promise<void>}
- */
-const updateRefreshToken = async (username, refreshToken) => {
-    await db.sequelize.transaction(async (t) => {
-        await db.User.update(
-            { refreshToken: refreshToken },
-            {
-                where: {
-                    username: username,
-                },
-            }
-        );
-    });
-};
-
-/**
- * Lấy thông tin tài khoản theo username
- * @param {string} username
- * @returns {Promise<User>} Thông tin tài khoản
- */
-const getUserByUsername = async (username) => {
-    const user = await db.User.findOne({ where: { username } });
-    return user;
-};
-
-/**
- * Kiểm tra quyền permissionId của roleId
+ * Check if role have permission
  * @param {string} roleId
  * @param {string} permissionId
- * @returns
+ * @returns {Promise<boolean>}
  */
 const havePermission = async (roleId, permissionId) => {
-    const count = await db.Role.count({
-        where: {
-            id: roleId,
-            [Op.or]: [
-                {
-                    "$permissions.id$": permissionId,
-                },
-                {
-                    isRoot: true,
-                },
-            ],
-        },
-        include: "permissions",
-    });
-    return count > 0;
+    const count = await knex("Roles")
+        .count("*", { as: "total" })
+        .leftJoin("Roles_Permissions", "Roles.id", "Roles_Permissions.roleId")
+        .where("Roles.isRoot", true)
+        .orWhere((builder) => {
+            builder
+                .where("Roles_Permissions.roleId", roleId)
+                .where("Roles_Permissions.permissionId", permissionId);
+        });
+    return count[0].total > 0;
 };
 
 module.exports = {
-    updateRefreshToken,
-    getUserByUsername,
     havePermission,
 };

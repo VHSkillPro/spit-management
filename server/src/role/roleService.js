@@ -1,74 +1,94 @@
-const db = require("../../models");
+const knex = require("../../knex/knex");
 
 /**
- * Lấy danh sách role
+ * @typedef {object} Role
+ * @property {string} id
+ * @property {string} name
+ * @property {boolean} isRoot
+ * @property {Date} createdAt
+ * @property {Date} updatedAt
+ */
+
+/**
+ * Get all roles
  * @returns {Promise<Role[]>}
  */
 const getAllRoles = async () => {
-    const roles = await db.Role.findAll({
-        attributes: { exclude: ["isRoot"] },
-    });
+    const roles = await knex("Roles").select();
     return roles;
 };
 
 /**
- * Đếm số lượng role
- * @returns {Promise<number>}
- */
-const countAllRoles = async () => {
-    const count = await db.Role.count();
-    return count;
-};
-
-/**
- * Lấy role theo roleId
+ * Get role by id
  * @param {string} roleId
- * @returns {Promise<Role>}
+ * @returns {Promise<Role>} Role
  */
 const getRoleById = async (roleId) => {
-    const role = await db.Role.findOne({
-        where: { id: roleId },
-    });
+    const role = await knex("Roles").where("id", roleId).first();
     return role;
 };
 
 /**
- * Tạo role mới
+ * Create new role
  * @param {string} roleId
  * @param {string} roleName
+ * @returns {Promise<void>}
  */
 const createRole = async (roleId, roleName) => {
-    await db.sequelize.transaction(async (t) => {
-        await db.Role.create({
+    await knex.transaction(async (trx) => {
+        await knex("Roles").insert({
             id: roleId,
             name: roleName,
+            isRoot: false,
         });
     });
 };
 
 /**
- * Lấy danh sách permission của role
+ * Update role
  * @param {string} roleId
- * @returns {Promise<Permission[]> | undefined}
+ * @param {object} role
+ * @param {string} [role.name]
+ * @param {string[]} [role.permissions]
+ * @returns {Promise<void>}
  */
-const getPermissionsOfRole = async (roleId) => {
-    const role = await db.Role.findOne({
-        where: { id: roleId },
-        include: "permissions",
+const updateRole = async (roleId, role) => {
+    await knex.transaction(async (trx) => {
+        // Update roleName
+        if (role?.name) {
+            await knex("Roles").where("id", roleId).update({
+                name: role.name,
+            });
+        }
+
+        if (role?.permissions) {
+            // Delete all permissions of role
+            await knex("Roles_Permissions").where("roleId", roleId).del();
+        }
+
+        if (role?.permissions && role.permissions.length > 0) {
+            // Insert new permissions
+            await knex("Roles_Permissions").insert(
+                role.permissions.map((permissionId) => ({
+                    roleId: roleId,
+                    permissionId: permissionId,
+                }))
+            );
+        }
     });
+};
 
-    // Nếu role là root thì trả về tất cả permission
-    if (role.isRoot) {
-        return await db.Permission.findAll();
-    }
-
-    return role?.permissions;
+const destroyRole = async (roleId) => {
+    await knex.transaction(async (trx) => {
+        await knex("Roles_Permissions").where("roleId", roleId).del();
+        await knex("Roles").where("id", roleId).del();
+    });
 };
 
 module.exports = {
     getAllRoles,
-    countAllRoles,
     getRoleById,
     createRole,
-    getPermissionsOfRole,
+    updateRole,
+    destroyRole,
 };

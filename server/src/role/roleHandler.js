@@ -3,245 +3,213 @@ const { StatusCodes } = require("http-status-codes");
 const roleService = require("./roleService");
 const roleMessage = require("./roleMessage");
 const userServices = require("../user/userService");
+const permissionService = require("../permission/permissionService");
 const AppError = require("../../utils/AppError");
-const db = require("../../models");
 
 /**
- * API trả về danh sách roles
+ * Handler get list of roles
  * @param {express.Request} req
  * @param {express.Response} res
  * @param {express.NextFunction} next
  */
 const index = async (req, res, next) => {
     try {
-        // Lấy tất cả roles từ database
         const roles = await roleService.getAllRoles();
 
         return res.status(StatusCodes.OK).send({
             data: {
                 roles: roles,
+                total: roles.length,
             },
             message: roleMessage.INDEX,
         });
     } catch (error) {
-        console.log(error);
-        return next(new AppError(StatusCodes.INTERNAL_SERVER_ERROR));
+        return next(error);
     }
 };
 
 /**
- * API trả về thông tin của role
- * @path /api/v1/roles/:roleId
- * @method GET
+ * Handler get role by id
  * @param {express.Request} req
- * @param {string} req.params.roleId - Id của role cần lấy thông tin
  * @param {express.Response} res
  * @param {express.NextFunction} next
  */
 const show = async (req, res, next) => {
     try {
-        // Lấy tất cả roles từ database
         const roleId = req.params.roleId;
         const role = await roleService.getRoleById(roleId);
 
         if (!role) {
             return next(
-                new AppError(StatusCodes.NOT_FOUND, roleMessage.NOT_FOUND)
+                new AppError(StatusCodes.NOT_FOUND, roleMessage.ROLE_NOT_FOUND)
             );
         }
 
+        const permissions = await permissionService.getPermissionsOfRole(
+            roleId
+        );
+
         return res.status(StatusCodes.OK).send({
             data: {
-                role: role,
+                role: { ...role, permissions },
             },
             message: roleMessage.SHOW,
         });
     } catch (error) {
-        console.log(error);
-        return next(new AppError(StatusCodes.INTERNAL_SERVER_ERROR));
+        return next(error);
     }
 };
 
 /**
- * API thêm role mới và hệ thống
- * @path /api/v1/roles
- * @method POST
+ * Handler create new role
  * @param {express.Request} req
- * @param {string} req.body.roleId - Id của role cần tạo
- * @param {string} req.body.roleName - Tên của role cần tạo
  * @param {express.Response} res
  * @param {express.NextFunction} next
  */
 const create = async (req, res, next) => {
     try {
-        const roleId = req.body.roleId;
-        const roleName = req.body.roleName;
-
-        // Kiểm tra xem role đã tồn tại chưa
+        const roleId = req.body.id;
+        const roleName = req.body.name;
         const role = await roleService.getRoleById(roleId);
+
+        // Check role is existed
         if (role) {
             return next(
-                new AppError(StatusCodes.CONFLICT, roleMessage.EXISTED)
+                new AppError(StatusCodes.CONFLICT, roleMessage.ROLE_EXISTED)
             );
         }
 
-        // Thêm role vào database
+        // Create new role
         await roleService.createRole(roleId, roleName);
 
         return res.status(StatusCodes.CREATED).send({
             message: roleMessage.CREATE,
         });
     } catch (error) {
-        console.log(error);
-        return next(new AppError(StatusCodes.INTERNAL_SERVER_ERROR));
+        return next(error);
     }
 };
 
-// /**
-//  * API cập nhật thông tin của role
-//  *
-//  * @path /api/v1/roles/:roleId
-//  * @method PATCH
-//  * @param {express.Request} req
-//  * @param {express.Response} res
-//  */
-// const update = async (req, res) => {
-//     try {
-//         // Lấy role cần chỉnh sửa
-//         const roleId = req.params.roleId;
+/**
+ * Handler update role
+ * @param {express.Request} req
+ * @param {express.Response} res
+ * @param {express.NextFunction} next
+ */
+const update = async (req, res, next) => {
+    try {
+        const roleId = req.params.roleId;
+        const roleName = req.body.name;
+        const permissions = req.body.permissions;
 
-//         // Kiểm tra xem role có phải là admin không
-//         if (roleId == 1) {
-//             return res.status(HTTP_STATUS_CODE.BAD_REQUEST).send({
-//                 status: "error",
-//                 message: "Không thể chỉnh sửa chức vụ này",
-//             });
-//         }
+        // Check role is not existed
+        const role = await roleService.getRoleById(roleId);
 
-//         // Kiểm tra xem role có tồn tại không
-//         const role = await db.Role.findOne({ where: { id: roleId } });
+        if (!role) {
+            return res.status(StatusCodes.NOT_FOUND).send({
+                message: roleMessage.ROLE_NOT_FOUND,
+            });
+        }
 
-//         if (!role) {
-//             return res.status(HTTP_STATUS_CODE.NOT_FOUND).send({
-//                 status: "error",
-//                 message: "Không tìm thấy tài nguyên",
-//             });
-//         }
+        // Update role
+        await roleService.updateRole(roleId, {
+            name: roleName,
+            permissions: permissions,
+        });
 
-//         // Chỉnh sửa thông tin role
-//         await db.sequelize.transaction(async (t) => {
-//             const roleName = req.body.name;
-
-//             role.name = roleName;
-//             await role.save();
-//         });
-
-//         return res.status(HTTP_STATUS_CODE.CREATED).send({
-//             status: "success",
-//             message: "Chỉnh sửa thông tin thành công",
-//         });
-//     } catch (error) {
-//         console.log(error);
-
-//         return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send({
-//             status: "error",
-//             message: "Lỗi máy chủ",
-//         });
-//     }
-// };
+        return res.status(StatusCodes.OK).send({
+            message: roleMessage.UPDATE,
+        });
+    } catch (error) {
+        return next(error);
+    }
+};
 
 /**
- * API xóa role khỏi hệ thống
- * @path /api/v1/roles/:roleId
- * @method DELETE
+ * Handler delete role
  * @param {express.Request} req
- * @param {string} req.params.roleId - Role cần xóa
  * @param {express.Response} res
  * @param {express.NextFunction} next
  */
 const destroy = async (req, res, next) => {
     try {
-        // Lấy role cần xóa
         const roleId = req.params.roleId;
         const role = await roleService.getRoleById(roleId);
 
-        // Kiểm tra xem role có tồn tại không
+        // Check role is not existed
         if (!role) {
             return next(
-                new AppError(StatusCodes.NOT_FOUND, roleMessage.NOT_FOUND)
+                new AppError(StatusCodes.NOT_FOUND, roleMessage.ROLE_NOT_FOUND)
             );
         }
 
-        // Kiểm tra xem role có phải là root không
+        // Check role is root
         if (role.isRoot) {
             return next(
                 new AppError(
                     StatusCodes.BAD_REQUEST,
-                    roleMessage.DONT_DELETE_ROOT
+                    roleMessage.CANNOT_DELETE_ROOT
                 )
             );
         }
 
-        // Kiểm tra xem role có người dùng đang sử dụng không
-        const users = await userServices.getUsersByRoleId(roleId);
+        // Check role is used
+        const users = await userServices.getFilteredUsers({ roleId: roleId });
 
         if (users && users.length > 0) {
             return next(
-                new AppError(StatusCodes.BAD_REQUEST, roleMessage.IS_USED)
+                new AppError(StatusCodes.BAD_REQUEST, roleMessage.ROLE_IS_USED)
             );
         }
 
-        // Xóa role và các dữ liệu liên quan khỏi database
-        await db.sequelize.transaction(async (t) => {
-            await role.destroy();
-        });
+        // Delete role
+        await roleService.destroyRole(roleId);
 
         return res.status(StatusCodes.OK).send({
             message: roleMessage.DESTROY,
         });
     } catch (error) {
-        console.log(error);
-        return next(new AppError(StatusCodes.INTERNAL_SERVER_ERROR));
+        return next(error);
     }
 };
 
-/**
- * API lấy danh sách quyền của role
- * @param {express.Request} req
- * @param {string} req.params.roleId - Role cần lấy danh sách quyền
- * @param {express.Response} res
- * @param {express.NextFunction} next
- */
-const permissions = async (req, res, next) => {
-    try {
-        const roleId = req.params.roleId;
-        const permissions = await roleService.getPermissionsOfRole(roleId);
+// /**
+//  * API lấy danh sách quyền của role
+//  * @param {express.Request} req
+//  * @param {string} req.params.roleId - Role cần lấy danh sách quyền
+//  * @param {express.Response} res
+//  * @param {express.NextFunction} next
+//  */
+// const permissions = async (req, res, next) => {
+//     try {
+//         const roleId = req.params.roleId;
+//         const permissions = await roleService.getPermissionsOfRole(roleId);
 
-        // Kiểm tra xem role có tồn tại không
-        if (!permissions) {
-            return next(
-                new AppError(StatusCodes.NOT_FOUND, roleMessage.NOT_FOUND)
-            );
-        }
+//         // Kiểm tra xem role có tồn tại không
+//         if (!permissions) {
+//             return next(
+//                 new AppError(StatusCodes.NOT_FOUND, roleMessage.NOT_FOUND)
+//             );
+//         }
 
-        // Trả về kết quả
-        return res.status(StatusCodes.OK).send({
-            data: {
-                permissions: permissions,
-            },
-            message: roleMessage.GET_PERMISSIONS,
-        });
-    } catch (error) {
-        console.log(error);
-        return next(new AppError(StatusCodes.INTERNAL_SERVER_ERROR));
-    }
-};
+//         // Trả về kết quả
+//         return res.status(StatusCodes.OK).send({
+//             data: {
+//                 permissions: permissions,
+//             },
+//             message: roleMessage.GET_PERMISSIONS,
+//         });
+//     } catch (error) {
+//         console.log(error);
+//         return next(new AppError(StatusCodes.INTERNAL_SERVER_ERROR));
+//     }
+// };
 
 module.exports = {
     index,
     show,
     create,
-    // update,
+    update,
     destroy,
-    permissions,
+    // permissions,
 };
