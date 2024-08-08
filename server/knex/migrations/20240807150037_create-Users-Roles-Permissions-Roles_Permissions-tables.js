@@ -48,6 +48,7 @@ exports.up = async function (knex) {
                         )
                     );
                 table.foreign("roleId").references("Roles.id");
+                table.foreign("permissionId").references("Permissions.id");
             });
 
             await knex.schema.createTable("Users", (table) => {
