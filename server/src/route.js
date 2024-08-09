@@ -4,6 +4,7 @@ const userRouter = require("./user/userRouter");
 const roleRouter = require("./role/roleRouter");
 const permissionRouter = require("./permission/permissionRouter");
 const semesterRouter = require("./semester/semesterRouter");
+const boardRouter = require("./board/boardRouter");
 
 /**
  * Define all the routes here
@@ -15,6 +16,7 @@ const appRouters = (app) => {
     app.use("/api/v1/roles", roleRouter);
     app.use("/api/v1/permissions", permissionRouter);
     app.use("/api/v1/semesters", semesterRouter);
+    app.use("/api/v1/boards", boardRouter);
 };
 
 module.exports = appRouters;
