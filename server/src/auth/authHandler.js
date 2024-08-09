@@ -50,6 +50,7 @@ const login = async (req, res, next) => {
             user: {
                 username: user.username,
                 roleId: user.roleId,
+                semesterId: user.semesterId,
             },
         };
 
@@ -106,6 +107,7 @@ const refreshTokens = async (req, res, next) => {
             user: {
                 username: user.username,
                 roleId: user.roleId,
+                semesterId: user.semesterId,
             },
         };
 

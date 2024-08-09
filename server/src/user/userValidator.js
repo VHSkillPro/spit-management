@@ -1,6 +1,7 @@
-const { body, query, param } = require("express-validator");
+const { body, query } = require("express-validator");
 const { validationResult } = require("../../utils/validators");
 const roleService = require("../role/roleService");
+const semesterService = require("../semester/semesterService");
 
 const validateFilterUser = [
     query("username").optional().notEmpty(),
@@ -44,6 +45,14 @@ const validateUpdateUser = [
         .optional()
         .custom(async (roleId) => {
             if (await roleService.getRoleById(roleId)) {
+                return true;
+            }
+            throw new Error();
+        }),
+    body("semesterId")
+        .optional()
+        .custom(async (value) => {
+            if (await semesterService.getSemesterById(value)) {
                 return true;
             }
             throw new Error();

@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt");
  * @property {string} username
  * @property {string} password
  * @property {string} roleId
+ * @property {string} semesterId
  * @property {string} refreshToken
  * @property {Date} createdAt
  * @property {Date} updatedAt

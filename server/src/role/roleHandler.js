@@ -106,9 +106,9 @@ const update = async (req, res, next) => {
         const role = await roleService.getRoleById(roleId);
 
         if (!role) {
-            return res.status(StatusCodes.NOT_FOUND).send({
-                message: roleMessage.ROLE_NOT_FOUND,
-            });
+            return next(
+                new AppError(StatusCodes.NOT_FOUND, roleMessage.ROLE_NOT_FOUND)
+            );
         }
 
         // Update role
@@ -173,43 +173,10 @@ const destroy = async (req, res, next) => {
     }
 };
 
-// /**
-//  * API lấy danh sách quyền của role
-//  * @param {express.Request} req
-//  * @param {string} req.params.roleId - Role cần lấy danh sách quyền
-//  * @param {express.Response} res
-//  * @param {express.NextFunction} next
-//  */
-// const permissions = async (req, res, next) => {
-//     try {
-//         const roleId = req.params.roleId;
-//         const permissions = await roleService.getPermissionsOfRole(roleId);
-
-//         // Kiểm tra xem role có tồn tại không
-//         if (!permissions) {
-//             return next(
-//                 new AppError(StatusCodes.NOT_FOUND, roleMessage.NOT_FOUND)
-//             );
-//         }
-
-//         // Trả về kết quả
-//         return res.status(StatusCodes.OK).send({
-//             data: {
-//                 permissions: permissions,
-//             },
-//             message: roleMessage.GET_PERMISSIONS,
-//         });
-//     } catch (error) {
-//         console.log(error);
-//         return next(new AppError(StatusCodes.INTERNAL_SERVER_ERROR));
-//     }
-// };
-
 module.exports = {
     index,
     show,
     create,
     update,
     destroy,
-    // permissions,
 };
