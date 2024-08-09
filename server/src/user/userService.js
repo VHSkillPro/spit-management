@@ -137,8 +137,6 @@ const createUser = async (user) => {
  * @param {object} data
  * @param {string} [data.password]
  * @param {string} [data.roleId]
- * @param {string} [data.semesterId]
- * @returns {Promise<void>}
  */
 const updateUser = async (username, data) => {
     await knex.transaction(async (trx) => {
@@ -151,10 +149,6 @@ const updateUser = async (username, data) => {
 
         if (data?.roleId === undefined) {
             delete data.roleId;
-        }
-
-        if (data?.semesterId === undefined) {
-            delete data.semesterId;
         }
 
         if (Object.keys(data).length > 0) {
