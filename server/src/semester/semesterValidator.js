@@ -7,6 +7,12 @@ const validateCreateSemester = [
     validationResult,
 ];
 
+const validateUpdateSemester = [
+    body("name").optional().isString(),
+    validationResult,
+];
+
 module.exports = {
     validateCreateSemester,
+    validateUpdateSemester,
 };

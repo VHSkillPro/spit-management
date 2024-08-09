@@ -91,8 +91,73 @@ const create = async (req, res, next) => {
     }
 };
 
+/**
+ * Handler update a semester
+ * @param {express.Request} req
+ * @param {express.Response} res
+ * @param {express.NextFunction} next
+ */
+const update = async (req, res, next) => {
+    try {
+        const semesterId = req.params.semesterId;
+        const semesterName = req.body.name;
+
+        const semester = await semesterService.getSemesterById(semesterId);
+        if (!semester) {
+            return next(
+                new AppError(
+                    StatusCodes.NOT_FOUND,
+                    semesterMessage.SEMESTER_NOT_FOUND
+                )
+            );
+        }
+
+        await semesterService.updateSemester(semesterId, {
+            name: semesterName,
+        });
+
+        return res.status(StatusCodes.OK).json({
+            messages: semesterMessage.UPDATE,
+        });
+    } catch (error) {
+        return next(error);
+    }
+};
+
+/**
+ * Handler delete a semester
+ * @param {express.Request} req
+ * @param {express.Response} res
+ * @param {express.NextFunction} next
+ */
+const destroy = async (req, res, next) => {
+    try {
+        const semesterId = req.params.semesterId;
+        const semester = await semesterService.getSemesterById(semesterId);
+
+        if (!semester) {
+            return next(
+                new AppError(
+                    StatusCodes.NOT_FOUND,
+                    semesterMessage.SEMESTER_NOT_FOUND
+                )
+            );
+        }
+
+        await semesterService.destroySemester(semesterId);
+
+        return res.status(StatusCodes.OK).json({
+            messages: semesterMessage.DESTROY,
+        });
+    } catch (error) {
+        return next(error);
+    }
+};
+
 module.exports = {
     index,
     show,
     create,
+    update,
+    destroy,
 };

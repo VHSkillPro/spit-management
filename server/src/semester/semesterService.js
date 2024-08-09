@@ -40,8 +40,36 @@ const createSemester = async (semester) => {
     });
 };
 
+/**
+ * Update a semester
+ * @param {string} id - Semester id
+ * @param {object} [semester]
+ * @param {string} [semester.name]
+ * @returns {Promise<void>}
+ */
+const updateSemester = async (id, semester) => {
+    await knex.transaction(async (trx) => {
+        if (semester?.name) {
+            await trx("Semesters").where({ id }).update(semester);
+        }
+    });
+};
+
+/**
+ * Delete a semester
+ * @param {string} id - Semester id
+ * @returns {Promise<void>}
+ */
+const destroySemester = async (id) => {
+    await knex.transaction(async (trx) => {
+        await trx("Semesters").where({ id }).del();
+    });
+};
+
 module.exports = {
     getAllSemesters,
     getSemesterById,
     createSemester,
+    updateSemester,
+    destroySemester,
 };

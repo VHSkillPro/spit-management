@@ -26,4 +26,19 @@ router.post(
     semesterHandler.create
 );
 
+router.patch(
+    "/:semesterId",
+    authMiddleware.isAuthenticated,
+    authMiddleware.checkPermission("semester.update"),
+    semesterValidator.validateUpdateSemester,
+    semesterHandler.update
+);
+
+router.delete(
+    "/:semesterId",
+    authMiddleware.isAuthenticated,
+    authMiddleware.checkPermission("semester.destroy"),
+    semesterHandler.destroy
+);
+
 module.exports = router;
